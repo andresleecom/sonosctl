@@ -47,7 +47,7 @@ sonosctl devices
 Run once:
 
 ```bash
-sonosctl auth-spotify --speaker "Coffee Room"
+sonosctl auth-spotify --speaker "Living Room"
 ```
 
 Process:
@@ -59,7 +59,7 @@ Process:
 Validation:
 
 ```bash
-sonosctl search "daft punk one more time" --speaker "Coffee Room"
+sonosctl search "daft punk one more time" --speaker "Living Room"
 ```
 
 ## 4. Team user onboarding
@@ -68,7 +68,7 @@ Per-user config at `~/.sonosctl/config.toml`:
 
 ```toml
 [defaults]
-speaker = "Coffee Room"
+speaker = "Living Room"
 timeout = 5
 search_limit = 8
 replace_queue = false
@@ -79,7 +79,7 @@ Quick validation per user:
 
 ```bash
 sonosctl devices
-sonosctl search "test" --speaker "Coffee Room"
+sonosctl search "test" --speaker "Living Room"
 ```
 
 ## 5. Daily operations
@@ -87,20 +87,20 @@ sonosctl search "test" --speaker "Coffee Room"
 Single-room playback:
 
 ```bash
-sonosctl play "track name" --speaker "Coffee Room" --pick
+sonosctl play "track name" --speaker "Living Room" --pick
 ```
 
 Multi-room playback:
 
 ```bash
-sonosctl group --coordinator "Coffee Room" --members "Dining Room"
-sonosctl play "track name" --speaker "Coffee Room" --pick
+sonosctl group --coordinator "Living Room" --members "Office"
+sonosctl play "track name" --speaker "Living Room" --pick
 ```
 
 Ungroup:
 
 ```bash
-sonosctl ungroup --speaker "Dining Room"
+sonosctl ungroup --speaker "Office"
 ```
 
 ## 6. Operational safety rules
@@ -115,8 +115,8 @@ sonosctl ungroup --speaker "Dining Room"
 ### A) `AuthTokenExpired`
 
 ```bash
-sonosctl auth-spotify --speaker "Coffee Room"
-sonosctl search "test" --speaker "Coffee Room"
+sonosctl auth-spotify --speaker "Living Room"
+sonosctl search "test" --speaker "Living Room"
 ```
 
 ### B) Speakers not discovered
@@ -136,7 +136,7 @@ If still empty:
 - Recreate group explicitly:
 
 ```bash
-sonosctl group --coordinator "Coffee Room" --members "Dining Room"
+sonosctl group --coordinator "Living Room" --members "Office"
 ```
 
 ## 8. Upgrade procedure
@@ -158,7 +158,7 @@ Post-upgrade checks:
 ```bash
 sonosctl --help
 sonosctl devices
-sonosctl search "test" --speaker "Coffee Room"
+sonosctl search "test" --speaker "Living Room"
 ```
 
 ## 9. Rollback strategy
@@ -175,3 +175,4 @@ When escalating issues, include:
 - `sonosctl devices` output
 - Target speaker
 - Whether Spotify playback works in Sonos app at the same time
+

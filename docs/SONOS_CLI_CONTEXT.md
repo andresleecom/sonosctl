@@ -9,8 +9,8 @@ Build and validate a local CLI tool to control Sonos speakers and Spotify playba
 - Sonos discovery works.
 - Spotify search and playback work after SoCo authorization.
 - Multi-speaker discovery confirmed:
-  - `Coffee Room` (`192.168.68.110`)
-  - `Dining Room` (`192.168.68.106`)
+  - `Living Room` (`192.168.68.110`)
+  - `Office` (`192.168.68.106`)
 
 ## Architecture
 - Language: Python
@@ -72,13 +72,13 @@ CLI now supports all formats and extracts `linkCode` from URL query when require
 1. Discover speakers:
    - `python sonos_spotify_cli.py devices`
 2. Authorize Spotify once:
-   - `python sonos_spotify_cli.py auth-spotify --speaker "Coffee Room"`
+   - `python sonos_spotify_cli.py auth-spotify --speaker "Living Room"`
 3. Search:
-   - `python sonos_spotify_cli.py search "daft punk one more time" --speaker "Coffee Room"`
+   - `python sonos_spotify_cli.py search "daft punk one more time" --speaker "Living Room"`
 4. Play:
-   - `python sonos_spotify_cli.py play "daft punk one more time" --speaker "Coffee Room" --pick`
+   - `python sonos_spotify_cli.py play "daft punk one more time" --speaker "Living Room" --pick`
 5. Group rooms and play multi-room:
-   - `python sonos_spotify_cli.py group --coordinator "Coffee Room" --members "Dining Room"`
+   - `python sonos_spotify_cli.py group --coordinator "Living Room" --members "Office"`
 
 ## Known Gaps
 - Search ranking can return broad matches.
@@ -101,3 +101,4 @@ CLI now supports all formats and extracts `linkCode` from URL query when require
 - Added `play-playlist` command to start full Spotify playlists by name or ID.
 - Added `shuffle` and `repeat` commands with state-query and set-mode support.
 - Added `crossfade` command with state-query and on/off control.
+

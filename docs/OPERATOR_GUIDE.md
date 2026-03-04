@@ -19,7 +19,7 @@ sonosctl devices
 5. Quick search test:
 
 ```bash
-sonosctl search "test" --speaker "Coffee Room"
+sonosctl search "test" --speaker "Living Room"
 ```
 
 If both commands succeed, operations are ready.
@@ -29,56 +29,56 @@ If both commands succeed, operations are ready.
 Play a track (with interactive selection):
 
 ```bash
-sonosctl play "track name" --speaker "Coffee Room" --pick
+sonosctl play "track name" --speaker "Living Room" --pick
 ```
 
 Search without playing:
 
 ```bash
-sonosctl search "track name" --speaker "Coffee Room"
+sonosctl search "track name" --speaker "Living Room"
 ```
 
 Check current playback before transitions:
 
 ```bash
-sonosctl status --speaker "Coffee Room"
+sonosctl status --speaker "Living Room"
 ```
 
 Transport and volume:
 
 ```bash
-sonosctl pause --speaker "Coffee Room"
-sonosctl resume --speaker "Coffee Room"
-sonosctl next --speaker "Coffee Room"
-sonosctl prev --speaker "Coffee Room"
-sonosctl volume 35 --speaker "Coffee Room"
+sonosctl pause --speaker "Living Room"
+sonosctl resume --speaker "Living Room"
+sonosctl next --speaker "Living Room"
+sonosctl prev --speaker "Living Room"
+sonosctl volume 35 --speaker "Living Room"
 ```
 
 View playlists:
 
 ```bash
-sonosctl playlists --speaker "Coffee Room"
-sonosctl playlists chill --speaker "Coffee Room"
+sonosctl playlists --speaker "Living Room"
+sonosctl playlists chill --speaker "Living Room"
 ```
 
 ## 3) Multi-speaker operation
 
-Group `Dining Room` into `Coffee Room`:
+Group `Office` into `Living Room`:
 
 ```bash
-sonosctl group --coordinator "Coffee Room" --members "Dining Room"
+sonosctl group --coordinator "Living Room" --members "Office"
 ```
 
 Play on coordinator (audio in both rooms):
 
 ```bash
-sonosctl play "track name" --speaker "Coffee Room" --pick
+sonosctl play "track name" --speaker "Living Room" --pick
 ```
 
 Ungroup:
 
 ```bash
-sonosctl ungroup --speaker "Dining Room"
+sonosctl ungroup --speaker "Office"
 ```
 
 ## 4) Shift end checklist
@@ -86,19 +86,19 @@ sonosctl ungroup --speaker "Dining Room"
 1. Set agreed volume level (example 25-35):
 
 ```bash
-sonosctl volume 30 --speaker "Coffee Room"
+sonosctl volume 30 --speaker "Living Room"
 ```
 
 2. Pause playback or set closing playlist per policy:
 
 ```bash
-sonosctl pause --speaker "Coffee Room"
+sonosctl pause --speaker "Living Room"
 ```
 
 3. If temporary grouping was used, ungroup speakers:
 
 ```bash
-sonosctl ungroup --speaker "Dining Room"
+sonosctl ungroup --speaker "Office"
 ```
 
 ## 5) Common incidents and quick fixes
@@ -108,8 +108,8 @@ sonosctl ungroup --speaker "Dining Room"
 Re-authorize:
 
 ```bash
-sonosctl auth-spotify --speaker "Coffee Room"
-sonosctl search "test" --speaker "Coffee Room"
+sonosctl auth-spotify --speaker "Living Room"
+sonosctl search "test" --speaker "Living Room"
 ```
 
 ### B) No speakers found
@@ -127,43 +127,44 @@ sonosctl devices --timeout 15
 Recreate group:
 
 ```bash
-sonosctl group --coordinator "Coffee Room" --members "Dining Room"
+sonosctl group --coordinator "Living Room" --members "Office"
 ```
 
 ## 6) Operational rules
 
 1. One active operator per shift.
 2. Always use exact speaker names from `sonosctl devices`.
-3. Use `Coffee Room` as standard multi-room coordinator.
+3. Use `Living Room` as standard multi-room coordinator.
 4. If an issue persists, capture command + full error and escalate.
 
 ## 7) Quick reference
 
 ```bash
 sonosctl devices
-sonosctl play "daft punk one more time" --speaker "Coffee Room" --pick
-sonosctl group --coordinator "Coffee Room" --members "Dining Room"
-sonosctl ungroup --speaker "Dining Room"
-sonosctl auth-spotify --speaker "Coffee Room"
+sonosctl play "daft punk one more time" --speaker "Living Room" --pick
+sonosctl group --coordinator "Living Room" --members "Office"
+sonosctl ungroup --speaker "Office"
+sonosctl auth-spotify --speaker "Living Room"
 ```
 
 Queue management during shifts:
 
 ```bash
-sonosctl queue --speaker "Coffee Room"
-sonosctl queue add "track name" --speaker "Coffee Room"
+sonosctl queue --speaker "Living Room"
+sonosctl queue add "track name" --speaker "Living Room"
 ```
 
 Playlist mode during shifts:
 
 ```bash
-sonosctl play-playlist "Chill Vibes" --speaker "Coffee Room" --shuffle
+sonosctl play-playlist "Chill Vibes" --speaker "Living Room" --shuffle
 ```
 
 Playback mode controls during shifts:
 
 ```bash
-sonosctl shuffle on --speaker "Coffee Room"
-sonosctl repeat all --speaker "Coffee Room"
-sonosctl crossfade on --speaker "Coffee Room"
+sonosctl shuffle on --speaker "Living Room"
+sonosctl repeat all --speaker "Living Room"
+sonosctl crossfade on --speaker "Living Room"
 ```
+

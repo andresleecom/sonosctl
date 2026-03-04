@@ -65,13 +65,13 @@ sonosctl devices
 2. Run one-time Spotify auth for this environment:
 
 ```bash
-sonosctl auth-spotify --speaker "Coffee Room"
+sonosctl auth-spotify --speaker "Living Room"
 ```
 
 3. Validate with search:
 
 ```bash
-sonosctl search "daft punk one more time" --speaker "Coffee Room"
+sonosctl search "daft punk one more time" --speaker "Living Room"
 ```
 
 ## Common commands
@@ -86,75 +86,75 @@ sonosctl devices --json
 ### Search and play
 
 ```bash
-sonosctl search "nujabes feather" --speaker "Coffee Room"
-sonosctl search "nujabes feather" --json --speaker "Coffee Room"
-sonosctl play "nujabes feather" --speaker "Coffee Room"
-sonosctl play "nujabes feather" --speaker "Coffee Room" --pick --limit 10
+sonosctl search "nujabes feather" --speaker "Living Room"
+sonosctl search "nujabes feather" --json --speaker "Living Room"
+sonosctl play "nujabes feather" --speaker "Living Room"
+sonosctl play "nujabes feather" --speaker "Living Room" --pick --limit 10
 ```
 
 ### Playlists
 
 ```bash
-sonosctl playlists --speaker "Coffee Room"
-sonosctl playlists chill --speaker "Coffee Room"
-sonosctl playlists --speaker "Coffee Room" --json
+sonosctl playlists --speaker "Living Room"
+sonosctl playlists chill --speaker "Living Room"
+sonosctl playlists --speaker "Living Room" --json
 ```
 
 ### Playlist playback
 
 ```bash
-sonosctl play-playlist "Chill Vibes" --speaker "Coffee Room"
-sonosctl play-playlist "Chill Vibes" --speaker "Coffee Room" --shuffle
-sonosctl play-playlist "spotify:user:spotify:playlist:0FQk6BADgIIYd3yTLCThjg" --speaker "Coffee Room"
-sonosctl play-playlist "Chill Vibes" --speaker "Coffee Room" --keep-queue
+sonosctl play-playlist "Chill Vibes" --speaker "Living Room"
+sonosctl play-playlist "Chill Vibes" --speaker "Living Room" --shuffle
+sonosctl play-playlist "spotify:user:spotify:playlist:0FQk6BADgIIYd3yTLCThjg" --speaker "Living Room"
+sonosctl play-playlist "Chill Vibes" --speaker "Living Room" --keep-queue
 ```
 
 ### Playback controls
 
 ```bash
-sonosctl status --speaker "Coffee Room"
-sonosctl status --speaker "Coffee Room" --json
-sonosctl pause --speaker "Coffee Room"
-sonosctl resume --speaker "Coffee Room"
-sonosctl next --speaker "Coffee Room"
-sonosctl prev --speaker "Coffee Room"
-sonosctl volume --speaker "Coffee Room"
-sonosctl volume 35 --speaker "Coffee Room"
+sonosctl status --speaker "Living Room"
+sonosctl status --speaker "Living Room" --json
+sonosctl pause --speaker "Living Room"
+sonosctl resume --speaker "Living Room"
+sonosctl next --speaker "Living Room"
+sonosctl prev --speaker "Living Room"
+sonosctl volume --speaker "Living Room"
+sonosctl volume 35 --speaker "Living Room"
 ```
 
 ### Multi-room grouping
 
 ```bash
-sonosctl group --coordinator "Coffee Room" --members "Dining Room"
-sonosctl play "daft punk one more time" --speaker "Coffee Room" --pick
-sonosctl ungroup --speaker "Dining Room"
+sonosctl group --coordinator "Living Room" --members "Office"
+sonosctl play "daft punk one more time" --speaker "Living Room" --pick
+sonosctl ungroup --speaker "Office"
 ```
 
 ### Queue management
 
 ```bash
-sonosctl queue --speaker "Coffee Room"
-sonosctl queue --speaker "Coffee Room" --json
-sonosctl queue add "nujabes feather" --speaker "Coffee Room"
-sonosctl queue add "nujabes feather" --speaker "Coffee Room" --pick --limit 10
-sonosctl queue clear --speaker "Coffee Room"
+sonosctl queue --speaker "Living Room"
+sonosctl queue --speaker "Living Room" --json
+sonosctl queue add "nujabes feather" --speaker "Living Room"
+sonosctl queue add "nujabes feather" --speaker "Living Room" --pick --limit 10
+sonosctl queue clear --speaker "Living Room"
 ```
 
 ### Playback modes
 
 ```bash
-sonosctl shuffle --speaker "Coffee Room"
-sonosctl shuffle on --speaker "Coffee Room"
-sonosctl shuffle off --speaker "Coffee Room"
+sonosctl shuffle --speaker "Living Room"
+sonosctl shuffle on --speaker "Living Room"
+sonosctl shuffle off --speaker "Living Room"
 
-sonosctl repeat --speaker "Coffee Room"
-sonosctl repeat all --speaker "Coffee Room"
-sonosctl repeat one --speaker "Coffee Room"
-sonosctl repeat off --speaker "Coffee Room"
+sonosctl repeat --speaker "Living Room"
+sonosctl repeat all --speaker "Living Room"
+sonosctl repeat one --speaker "Living Room"
+sonosctl repeat off --speaker "Living Room"
 
-sonosctl crossfade --speaker "Coffee Room"
-sonosctl crossfade on --speaker "Coffee Room"
-sonosctl crossfade off --speaker "Coffee Room"
+sonosctl crossfade --speaker "Living Room"
+sonosctl crossfade on --speaker "Living Room"
+sonosctl crossfade off --speaker "Living Room"
 ```
 
 ## Configuration
@@ -165,7 +165,7 @@ Example:
 
 ```toml
 [defaults]
-speaker = "Coffee Room"
+speaker = "Living Room"
 timeout = 5
 search_limit = 8
 replace_queue = false
@@ -183,13 +183,13 @@ sonosctl --config C:\path\to\config.toml devices
 ### `AuthTokenExpired`
 
 ```bash
-sonosctl auth-spotify --speaker "Coffee Room"
+sonosctl auth-spotify --speaker "Living Room"
 ```
 
 Then retry with explicit speaker:
 
 ```bash
-sonosctl search "test" --speaker "Coffee Room"
+sonosctl search "test" --speaker "Living Room"
 ```
 
 ### `No Sonos speakers found on your network`
@@ -238,3 +238,4 @@ sonosctl playlists --help
 - License: `MIT` (see `LICENSE`)
 - Vulnerability reporting: `SECURITY.md`
 - Pre-release hardening: `docs/HARDENING_CHECKLIST.md`
+
