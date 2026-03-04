@@ -153,3 +153,9 @@ Queue management during shifts:
 sonosctl queue --speaker "Coffee Room"
 sonosctl queue add "track name" --speaker "Coffee Room"
 ```
+
+Playlist mode during shifts:
+
+```bash
+sonosctl play-playlist "Chill Vibes" --speaker "Coffee Room" --shuffle
+```

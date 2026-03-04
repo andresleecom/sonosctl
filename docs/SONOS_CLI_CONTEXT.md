@@ -24,6 +24,7 @@ Build and validate a local CLI tool to control Sonos speakers and Spotify playba
 - `search`
 - `playlists`
 - `play`
+- `play-playlist`
 - `status`
 - `queue`
 - `group`
@@ -82,7 +83,7 @@ CLI now supports all formats and extracts `linkCode` from URL query when require
 ## Suggested Next Improvements
 1. Add stronger result ranking (exact match bias).
 2. Improve metadata parsing fallbacks.
-3. Add playlist playback command by selected index or ID.
+3. Add advanced queue operations (remove/reorder specific items).
 
 ## Session Summary
 - Scaffolded Python CLI project.
@@ -93,3 +94,4 @@ CLI now supports all formats and extracts `linkCode` from URL query when require
 - Added deployment and operator documentation.
 - Added `status` command and fixed duplicate track-search call in `play`.
 - Added `queue` commands (list/add/clear) for non-interruptive queue management.
+- Added `play-playlist` command to start full Spotify playlists by name or ID.

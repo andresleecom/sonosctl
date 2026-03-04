@@ -290,7 +290,7 @@ def list_playlists(
 
     if query:
         q = query.lower()
-        items = [x for x in items if q in x.title.lower() or q in x.owner.lower()]
+        items = [x for x in items if q in x.title.lower() or q in x.owner.lower() or q in x.item_id.lower()]
 
     return items[:limit]
 
@@ -632,6 +632,58 @@ def cmd_queue_clear(args: argparse.Namespace) -> int:
     return 0
 
 
+def _select_playlist(playlists: Sequence[PlaylistResult], selector: str) -> PlaylistResult | None:
+    normalized = selector.strip().lower()
+    if not normalized:
+        return None
+
+    by_id = [p for p in playlists if p.item_id.lower() == normalized]
+    if len(by_id) == 1:
+        return by_id[0]
+
+    exact_title = [p for p in playlists if p.title.lower() == normalized]
+    if len(exact_title) == 1:
+        return exact_title[0]
+
+    partial_title = [p for p in playlists if normalized in p.title.lower()]
+    if len(partial_title) == 1:
+        return partial_title[0]
+
+    return None
+
+
+def cmd_play_playlist(args: argparse.Namespace) -> int:
+    speaker = _with_speaker(args, "play playlist")
+    search_limit = max(1, args.limit)
+
+    # Query first by selector; if not enough signal, expand results and resolve by id/title.
+    playlists = list_playlists(limit=search_limit, query=args.selector, device=speaker)
+    selected = _select_playlist(playlists, args.selector)
+    if selected is None:
+        expanded = list_playlists(limit=max(100, search_limit), query="", device=speaker)
+        selected = _select_playlist(expanded, args.selector)
+
+    if selected is None:
+        print(f"No playlist found for selector: {args.selector}")
+        return 1
+
+    replace_queue = not args.keep_queue
+    if replace_queue:
+        speaker.clear_queue()
+
+    if args.shuffle:
+        speaker.shuffle = True
+
+    queue_position = speaker.add_to_queue(selected.item)
+    speaker.play_from_queue(max(0, queue_position - 1))
+
+    action = "replaced queue and started" if replace_queue else "queued and started"
+    print(
+        f'Now playing playlist on {speaker.player_name}: "{selected.title}" ({selected.owner}) [{action}]'
+    )
+    return 0
+
+
 def cmd_group(args: argparse.Namespace) -> int:
     coordinator = resolve_speaker(
         name=args.coordinator,
@@ -771,6 +823,18 @@ def build_parser() -> argparse.ArgumentParser:
     play.add_argument("--limit", type=int, default=None, help="Search result count (used by --pick)")
     add_speaker_selection_args(play)
     play.set_defaults(func=cmd_play)
+
+    play_playlist = subparsers.add_parser("play-playlist", help="Play a Spotify playlist by name or ID")
+    play_playlist.add_argument("selector", help="Playlist name or playlist item ID")
+    play_playlist.add_argument("--limit", type=int, default=20, help="Search result count for lookup")
+    play_playlist.add_argument("--shuffle", action="store_true", help="Enable shuffle before playback")
+    play_playlist.add_argument(
+        "--keep-queue",
+        action="store_true",
+        help="Do not clear queue before adding playlist (default is to clear queue)",
+    )
+    add_speaker_selection_args(play_playlist)
+    play_playlist.set_defaults(func=cmd_play_playlist)
 
     queue = subparsers.add_parser("queue", help="View and manage playback queue")
     queue.add_argument("--limit", type=int, default=20, help="Max queue items to show")

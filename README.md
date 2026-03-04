@@ -15,6 +15,7 @@ Related documentation:
 - List Spotify playlists
 - Show live playback status (`status`)
 - View and manage playback queue (`queue`, `queue add`, `queue clear`)
+- Play full Spotify playlists by name or ID (`play-playlist`)
 - Playback controls (`pause`, `resume`, `next`, `prev`)
 - Volume control
 - Multi-room grouping (`group`, `ungroup`)
@@ -96,6 +97,15 @@ sonosctl play "nujabes feather" --speaker "Coffee Room" --pick --limit 10
 sonosctl playlists --speaker "Coffee Room"
 sonosctl playlists chill --speaker "Coffee Room"
 sonosctl playlists --speaker "Coffee Room" --json
+```
+
+### Playlist playback
+
+```bash
+sonosctl play-playlist "Chill Vibes" --speaker "Coffee Room"
+sonosctl play-playlist "Chill Vibes" --speaker "Coffee Room" --shuffle
+sonosctl play-playlist "spotify:user:spotify:playlist:0FQk6BADgIIYd3yTLCThjg" --speaker "Coffee Room"
+sonosctl play-playlist "Chill Vibes" --speaker "Coffee Room" --keep-queue
 ```
 
 ### Playback controls
