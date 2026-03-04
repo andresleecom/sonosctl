@@ -1,241 +1,180 @@
-﻿# sonosctl
+# sonosctl
 
-A Python CLI for controlling Sonos speakers and Spotify playback on a local network.
+Control your Sonos speakers and Spotify from the terminal.
 
-Related documentation:
-- Technical context and change log: `docs/SONOS_CLI_CONTEXT.md`
-- Deployment and operations runbook: `docs/DEPLOYMENT_RUNBOOK.md`
-- Daily operator quick guide: `docs/OPERATOR_GUIDE.md`
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## Features
+```
+$ sonosctl devices
+Living Room | 192.168.68.110 | Sonos One
+Office      | 192.168.68.106 | Sonos One
 
-- Discover Sonos speakers on LAN
-- Search Spotify tracks through Sonos
-- Play tracks with optional interactive selection (`--pick`)
-- List Spotify playlists
-- Show live playback status (`status`)
-- View and manage playback queue (`queue`, `queue add`, `queue clear`)
-- Play full Spotify playlists by name or ID (`play-playlist`)
-- Playback controls (`pause`, `resume`, `next`, `prev`)
-- Crossfade mode control (`crossfade`)
-- Volume control
-- Multi-room grouping (`group`, `ungroup`)
-- JSON output for scripting (`devices`, `search`, `playlists`)
-- Default config via `~/.sonosctl/config.toml`
-- One-time CLI Spotify auth helper (`auth-spotify`)
+$ sonosctl play "nujabes feather" --speaker "Living Room"
+Now playing on Living Room: Feather - Nujabes (Modal Soul)
 
-## Requirements
+$ sonosctl status
+Speaker: Living Room
+State: PLAYING
+Track: Feather
+Artist: Nujabes
+Album: Modal Soul
+Position: 0:01:23 / 0:04:47
+Volume: 25
 
-- Python `3.10+`
-- Sonos speakers and control machine on the same LAN/VLAN
-- Spotify added in Sonos app
-- Local network access to Sonos devices
+$ sonosctl queue add "khruangbin evan finds the third room"
+Added to queue: Evan Finds the Third Room - Khruangbin
 
-## Installation
-
-### Option A: Local development install
-
-```bash
-python -m venv .venv
-# Windows PowerShell
-.\.venv\Scripts\Activate.ps1
-python -m pip install -e .
+$ sonosctl group --coordinator "Living Room" --members "Office"
+Grouped: Office -> Living Room
 ```
 
-### Option B: End-user install (recommended)
+## Install
 
 ```bash
-pipx install .
+pipx install sonosctl
 ```
 
-If published to PyPI:
+Or with pip:
 
 ```bash
-pipx install sonos-spotify-cli
+pip install sonosctl
 ```
 
-## First-time setup
+From source:
 
-1. Discover speakers:
+```bash
+git clone https://github.com/andresleecom/sonosctl.git
+cd sonosctl
+python -m venv .venv && source .venv/bin/activate
+pip install -e .
+```
+
+## Quick start
+
+**1. Discover speakers**
 
 ```bash
 sonosctl devices
 ```
 
-2. Run one-time Spotify auth for this environment:
+**2. Authenticate Spotify** (one-time per speaker)
 
 ```bash
 sonosctl auth-spotify --speaker "Living Room"
 ```
 
-3. Validate with search:
+Open the link, authorize, then press Enter.
+
+**3. Play something**
 
 ```bash
-sonosctl search "daft punk one more time" --speaker "Living Room"
+sonosctl play "bohemian rhapsody"
 ```
 
-## Common commands
+## Commands
 
-### Discovery
+### Playback
 
-```bash
-sonosctl devices
-sonosctl devices --json
-```
+| Command | Description |
+|---------|-------------|
+| `play <query>` | Search and play a track |
+| `play-playlist <name>` | Play a Spotify playlist by name |
+| `pause` | Pause playback |
+| `resume` | Resume playback |
+| `next` | Skip to next track |
+| `prev` | Previous track |
+| `volume [level]` | Get or set volume (0-100) |
+| `status` | Show current track, position, volume |
 
-### Search and play
+### Queue
 
-```bash
-sonosctl search "nujabes feather" --speaker "Living Room"
-sonosctl search "nujabes feather" --json --speaker "Living Room"
-sonosctl play "nujabes feather" --speaker "Living Room"
-sonosctl play "nujabes feather" --speaker "Living Room" --pick --limit 10
-```
+| Command | Description |
+|---------|-------------|
+| `queue` | Show playback queue |
+| `queue add <query>` | Add a track without interrupting |
+| `queue clear` | Clear the queue |
 
-### Playlists
+### Search & Browse
 
-```bash
-sonosctl playlists --speaker "Living Room"
-sonosctl playlists chill --speaker "Living Room"
-sonosctl playlists --speaker "Living Room" --json
-```
-
-### Playlist playback
-
-```bash
-sonosctl play-playlist "Chill Vibes" --speaker "Living Room"
-sonosctl play-playlist "Chill Vibes" --speaker "Living Room" --shuffle
-sonosctl play-playlist "spotify:user:spotify:playlist:0FQk6BADgIIYd3yTLCThjg" --speaker "Living Room"
-sonosctl play-playlist "Chill Vibes" --speaker "Living Room" --keep-queue
-```
-
-### Playback controls
-
-```bash
-sonosctl status --speaker "Living Room"
-sonosctl status --speaker "Living Room" --json
-sonosctl pause --speaker "Living Room"
-sonosctl resume --speaker "Living Room"
-sonosctl next --speaker "Living Room"
-sonosctl prev --speaker "Living Room"
-sonosctl volume --speaker "Living Room"
-sonosctl volume 35 --speaker "Living Room"
-```
-
-### Multi-room grouping
-
-```bash
-sonosctl group --coordinator "Living Room" --members "Office"
-sonosctl play "daft punk one more time" --speaker "Living Room" --pick
-sonosctl ungroup --speaker "Office"
-```
-
-### Queue management
-
-```bash
-sonosctl queue --speaker "Living Room"
-sonosctl queue --speaker "Living Room" --json
-sonosctl queue add "nujabes feather" --speaker "Living Room"
-sonosctl queue add "nujabes feather" --speaker "Living Room" --pick --limit 10
-sonosctl queue clear --speaker "Living Room"
-```
+| Command | Description |
+|---------|-------------|
+| `search <query>` | Search Spotify tracks |
+| `playlists [query]` | List or search playlists |
 
 ### Playback modes
 
-```bash
-sonosctl shuffle --speaker "Living Room"
-sonosctl shuffle on --speaker "Living Room"
-sonosctl shuffle off --speaker "Living Room"
+| Command | Description |
+|---------|-------------|
+| `shuffle [on\|off]` | Toggle shuffle mode |
+| `repeat [off\|one\|all]` | Set repeat mode |
+| `crossfade [on\|off]` | Toggle crossfade between tracks |
 
-sonosctl repeat --speaker "Living Room"
-sonosctl repeat all --speaker "Living Room"
-sonosctl repeat one --speaker "Living Room"
-sonosctl repeat off --speaker "Living Room"
+### Multi-room & Setup
 
-sonosctl crossfade --speaker "Living Room"
-sonosctl crossfade on --speaker "Living Room"
-sonosctl crossfade off --speaker "Living Room"
-```
+| Command | Description |
+|---------|-------------|
+| `devices` | Discover speakers on your network |
+| `group` | Group speakers for synchronized playback |
+| `ungroup` | Remove a speaker from its group |
+| `auth-spotify` | One-time Spotify authorization |
+
+Most commands accept `--speaker`, `--json`, and `--timeout`. Run `sonosctl <command> --help` for details.
 
 ## Configuration
 
-Default config path: `~/.sonosctl/config.toml`
-
-Example:
+Create `~/.sonosctl/config.toml` to set defaults:
 
 ```toml
 [defaults]
 speaker = "Living Room"
 timeout = 5
 search_limit = 8
-replace_queue = false
-json = false
 ```
 
-Override config file path:
+With a default speaker configured, you can omit `--speaker` from all commands.
+
+## Automation
+
+sonosctl is designed for scripting and automation. JSON output on every major command:
 
 ```bash
-sonosctl --config C:\path\to\config.toml devices
+sonosctl status --json | jq '.track'
+sonosctl queue --json | jq '.queue[].title'
+```
+
+Pair it with cron for scheduled playback:
+
+```bash
+# Morning playlist at 8 AM
+0 8 * * * sonosctl play-playlist "Morning Chill" --shuffle
+
+# Lower volume at 10 PM
+0 22 * * * sonosctl volume 10
 ```
 
 ## Troubleshooting
 
-### `AuthTokenExpired`
+**`AuthTokenExpired`** — Re-run `sonosctl auth-spotify --speaker "Living Room"`.
 
-```bash
-sonosctl auth-spotify --speaker "Living Room"
-```
+**No speakers found** — Verify same LAN/VLAN, disable VPN, try `sonosctl devices --timeout 15`.
 
-Then retry with explicit speaker:
+**Auth link not working** — Run `auth-spotify` again and use the new code immediately.
 
-```bash
-sonosctl search "test" --speaker "Living Room"
-```
+## Requirements
 
-### `No Sonos speakers found on your network`
+- Python 3.10+
+- Sonos speakers on the same local network
+- Spotify linked in the Sonos app
 
-- Confirm same LAN/VLAN
-- Disable local VPN
-- Check AP/router client isolation settings
-- Increase timeout:
+## Contributing
 
-```bash
-sonosctl devices --timeout 15
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-### Invalid auth link code
+## License
 
-- Run `auth-spotify` again
-- Use the new code immediately
-- Avoid browser contexts that block login/session handoff
+MIT - see [LICENSE](LICENSE).
 
-## Release and distribution
+---
 
-Build and publish:
-
-```bash
-python -m pip install --upgrade build twine
-python -m build
-python -m twine upload dist/*
-```
-
-Install from PyPI:
-
-```bash
-pipx install sonos-spotify-cli
-```
-
-## Help
-
-```bash
-sonosctl --help
-sonosctl play --help
-sonosctl playlists --help
-```
-
-## Security and Licensing
-
-- License: `MIT` (see `LICENSE`)
-- Vulnerability reporting: `SECURITY.md`
-- Pre-release hardening: `docs/HARDENING_CHECKLIST.md`
-
+Made with love from Cancun, Mexico.

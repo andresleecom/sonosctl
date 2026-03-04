@@ -1,12 +1,30 @@
 [project]
-name = "sonos-spotify-cli"
+name = "sonosctl"
 version = "0.1.0"
-description = "CLI to control Sonos speakers and play Spotify content on local network"
+description = "Control Sonos speakers and Spotify from your terminal"
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.10"
-dependencies = [
-  "soco>=0.30.6",
-  "tomli>=2.0.1; python_version < '3.11'"
+authors = [{ name = "Andres Lee" }]
+keywords = ["sonos", "spotify", "cli", "music", "home-automation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Sound/Audio",
 ]
+dependencies = [
+    "soco>=0.30.6",
+    "tomli>=2.0.1; python_version < '3.11'",
+]
+
+[project.urls]
+Homepage = "https://github.com/andresleecom/sonosctl"
+Issues = "https://github.com/andresleecom/sonosctl/issues"
 
 [project.scripts]
 sonosctl = "sonos_spotify_cli:main"
