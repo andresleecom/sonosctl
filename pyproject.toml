@@ -27,4 +27,4 @@ Homepage = "https://github.com/andresleecom/sonosctl"
 Issues = "https://github.com/andresleecom/sonosctl/issues"
 
 [project.scripts]
-sonosctl = "sonos_spotify_cli:main"
+sonosctl = "sonosctl.cli:main"
