@@ -190,3 +190,9 @@ sonosctl --help
 sonosctl play --help
 sonosctl playlists --help
 ```
+
+## Security and Licensing
+
+- License: `MIT` (see `LICENSE`)
+- Vulnerability reporting: `SECURITY.md`
+- Pre-release hardening: `docs/HARDENING_CHECKLIST.md`
