@@ -1,4 +1,4 @@
-# Sonos CLI Context Log
+﻿# Sonos CLI Context Log
 
 Last updated: 2026-03-04
 
@@ -7,7 +7,7 @@ Build and validate a local CLI tool to control Sonos speakers and Spotify playba
 
 ## Current Status
 - Sonos discovery works.
-- Spotify search/play works after completing SoCo auth flow.
+- Spotify search and playback work after SoCo authorization.
 - Multi-speaker discovery confirmed:
   - `Coffee Room` (`192.168.68.110`)
   - `Dining Room` (`192.168.68.106`)
@@ -17,73 +17,73 @@ Build and validate a local CLI tool to control Sonos speakers and Spotify playba
 - Core library: `soco`
 - Entry point: `sonos_spotify_cli.py`
 - Package config: `pyproject.toml`
-- User docs: `README.md`
+- Main docs: `README.md`
 
-## Commands Implemented
+## Implemented Commands
 - `devices`
 - `search`
+- `playlists`
 - `play`
+- `group`
+- `ungroup`
+- `auth-spotify`
 - `pause`
 - `resume`
 - `next`
 - `prev`
 - `volume`
-- `auth-spotify`
 
-## Features Implemented
+## Implemented Features
 - JSON output:
   - `devices --json`
   - `search --json`
-- Interactive pick:
+  - `playlists --json`
+- Interactive selection:
   - `play --pick`
 - Config defaults in `~/.sonosctl/config.toml`
-- Speaker-scoped Spotify service usage for `search`/`play`
+- Speaker-scoped Spotify service usage for `search` and `play`
+- Multi-room grouping and ungrouping
 
-## Auth/Token Issue History
-- Observed error:
-  - `Authorization for Spotify expired, is invalid or has not yet been completed: [ns0:Client.AuthTokenExpired / authTokenExpired / None]`
-- Root cause:
-  - Sonos-side/SoCo token flow required dedicated SoCo auth.
-- Fix added:
-  - `auth-spotify` command to run SoCo device link flow.
+## Auth and Token Notes
+Observed error during development:
+- `Authorization for Spotify expired, is invalid or has not yet been completed: [ns0:Client.AuthTokenExpired / authTokenExpired / None]`
 
-## SoCo Auth Command Behavior (Important)
-`begin_authentication()` returned different shapes depending on environment:
-- tuple/list
-- dict
-- URL string only
+Resolution:
+- Added `auth-spotify` command to run SoCo device-link flow.
 
-CLI now supports all three and extracts `linkCode` from URL query when needed.
+Important behavior:
+- `begin_authentication()` returned different response shapes depending on runtime:
+  - tuple/list
+  - dict
+  - URL string only
+
+CLI now supports all formats and extracts `linkCode` from URL query when required.
 
 ## Verified Working Flow
 1. Discover speakers:
    - `python sonos_spotify_cli.py devices`
-2. Run one-time SoCo Spotify auth:
+2. Authorize Spotify once:
    - `python sonos_spotify_cli.py auth-spotify --speaker "Coffee Room"`
 3. Search:
    - `python sonos_spotify_cli.py search "daft punk one more time" --speaker "Coffee Room"`
 4. Play:
    - `python sonos_spotify_cli.py play "daft punk one more time" --speaker "Coffee Room" --pick`
+5. Group rooms and play multi-room:
+   - `python sonos_spotify_cli.py group --coordinator "Coffee Room" --members "Dining Room"`
 
 ## Known Gaps
-- Some search results are broad/noisy.
-- Artist/album metadata may show as `Unknown` for some items returned by Sonos service.
-- Playlist browsing is not yet implemented as a command.
+- Search ranking can return broad matches.
+- Artist/album metadata may be `Unknown` for some Sonos responses.
 
-## Next Work Items
-1. Add `playlists` command for Spotify playlists.
-2. Improve metadata extraction (artist/album fallbacks).
-3. Improve play ranking (exact match bias).
+## Suggested Next Improvements
+1. Add stronger result ranking (exact match bias).
+2. Improve metadata parsing fallbacks.
+3. Add playlist playback command by selected index or ID.
 
-## Release Notes (Session)
-- Added CLI project scaffolding.
-- Added Sonos + Spotify command set.
+## Session Summary
+- Scaffolded Python CLI project.
+- Implemented Sonos + Spotify control commands.
 - Added JSON output and config support.
-- Added `auth-spotify` command and compatibility handling for auth return formats.
-
-## 2026-03-04 update
-- Added `playlists` command to list Spotify playlists via Sonos.
-- Added optional playlist query filter and JSON output.
-- Added docs section in README for playlist usage.
-- Added `group` and `ungroup` commands for multi-speaker playback.
-- Group model: play on coordinator controls all grouped speakers.
+- Added robust `auth-spotify` flow compatibility.
+- Added playlists and multi-room group operations.
+- Added deployment and operator documentation.

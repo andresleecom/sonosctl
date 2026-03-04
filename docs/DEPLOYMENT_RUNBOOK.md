@@ -1,45 +1,48 @@
-# Sonos CLI Deployment Runbook
+ï»¿# Sonos CLI Deployment Runbook
 
 Last updated: 2026-03-04
 
 ## Objective
-Desplegar y operar el CLI en otro entorno para que varios usuarios controlen música en bocinas Sonos.
+Deploy and operate `sonosctl` in a shared environment where multiple users manage Sonos speaker playback.
 
 ## Scope
-- Instalación
-- Onboarding de usuarios
-- Operación diaria
-- Incidentes comunes
+- Installation
+- User onboarding
+- Daily operations
+- Incident response
+- Upgrade and rollback
 
-## 1. Pre-deployment Checklist
+## 1. Pre-deployment checklist
 
-- [ ] Sonos visible y funcional en Sonos app
-- [ ] Spotify agregado en Sonos app
-- [ ] Host de control en la misma LAN/VLAN que Sonos
-- [ ] Firewall local permite tráfico saliente a LAN
-- [ ] Python 3.10+ instalado
-- [ ] `pipx` instalado para usuarios finales
+- [ ] Sonos system is visible and functional in Sonos app
+- [ ] Spotify is added in Sonos app
+- [ ] Control host is on same LAN/VLAN as Sonos
+- [ ] Local firewall allows outbound LAN traffic
+- [ ] Python 3.10+ installed
+- [ ] `pipx` installed for end users
 
-## 2. Install on Control Host
+## 2. Install on control host
+
+From PyPI:
 
 ```bash
 pipx install sonos-spotify-cli
 ```
 
-Si se instala desde repo local:
+From local repository:
 
 ```bash
 pipx install .
 ```
 
-Verify:
+Validation:
 
 ```bash
 sonosctl --help
 sonosctl devices
 ```
 
-## 3. First-time Authorization (per environment)
+## 3. First-time authorization (per environment)
 
 Run once:
 
@@ -50,8 +53,8 @@ sonosctl auth-spotify --speaker "Coffee Room"
 Process:
 1. Open URL shown in terminal
 2. Enter code shown
-3. Login in Spotify and approve
-4. Return terminal and confirm
+3. Sign in to Spotify and approve
+4. Return to terminal and confirm
 
 Validation:
 
@@ -59,9 +62,9 @@ Validation:
 sonosctl search "daft punk one more time" --speaker "Coffee Room"
 ```
 
-## 4. Team User Onboarding
+## 4. Team user onboarding
 
-Per user config at `~/.sonosctl/config.toml`:
+Per-user config at `~/.sonosctl/config.toml`:
 
 ```toml
 [defaults]
@@ -79,15 +82,15 @@ sonosctl devices
 sonosctl search "test" --speaker "Coffee Room"
 ```
 
-## 5. Daily Operations
+## 5. Daily operations
 
-Single speaker playback:
+Single-room playback:
 
 ```bash
 sonosctl play "track name" --speaker "Coffee Room" --pick
 ```
 
-Group playback:
+Multi-room playback:
 
 ```bash
 sonosctl group --coordinator "Coffee Room" --members "Dining Room"
@@ -100,26 +103,19 @@ Ungroup:
 sonosctl ungroup --speaker "Dining Room"
 ```
 
-## 6. Operational Safety Rules
+## 6. Operational safety rules
 
-- Always set `--speaker` (or config default) in shared environments
-- Avoid running control commands from multiple terminals at once
-- Use one coordinator room for grouped playback
-- Keep auth/session tasks to designated operator/admin
+- Always set `--speaker` (or define config default) in shared usage
+- Avoid issuing control commands from multiple terminals simultaneously
+- Use one standard coordinator speaker for grouped playback
+- Keep auth/session actions restricted to designated operators
 
-## 7. Incident Response
+## 7. Incident response
 
 ### A) `AuthTokenExpired`
 
-1. Re-run auth:
-
 ```bash
 sonosctl auth-spotify --speaker "Coffee Room"
-```
-
-2. Retest with explicit speaker:
-
-```bash
 sonosctl search "test" --speaker "Coffee Room"
 ```
 
@@ -132,32 +128,32 @@ sonosctl devices --timeout 15
 If still empty:
 - Check VLAN/AP isolation
 - Disable local VPN
-- Confirm Sonos app can play from same network
+- Confirm Sonos app playback on same network
 
 ### C) Group commands fail
 
 - Verify exact speaker names from `sonosctl devices`
-- Recreate group explicitly
+- Recreate group explicitly:
 
 ```bash
 sonosctl group --coordinator "Coffee Room" --members "Dining Room"
 ```
 
-## 8. Upgrade Procedure
+## 8. Upgrade procedure
 
-If installed with pipx from PyPI:
+If installed from PyPI:
 
 ```bash
 pipx upgrade sonos-spotify-cli
 ```
 
-If installed from local path/repo:
+If installed from local repo:
 
 ```bash
 pipx reinstall sonos-spotify-cli
 ```
 
-Run post-upgrade checks:
+Post-upgrade checks:
 
 ```bash
 sonosctl --help
@@ -165,17 +161,17 @@ sonosctl devices
 sonosctl search "test" --speaker "Coffee Room"
 ```
 
-## 9. Rollback Strategy
+## 9. Rollback strategy
 
-- Keep previous release tag/wheel in internal artifact store.
-- Reinstall previous known-good version with pipx.
-- Re-run smoke tests from section 8.
+- Keep previous release tags/wheels in artifact storage
+- Reinstall previous known-good version with `pipx`
+- Re-run smoke checks from section 8
 
-## 10. Support Data to Capture
+## 10. Support data to capture
 
-When reporting issues include:
-- Command run
+When escalating issues, include:
+- Command executed
 - Full CLI error output
 - `sonosctl devices` output
-- Speaker targeted
-- Whether Sonos app can play Spotify at same moment
+- Target speaker
+- Whether Spotify playback works in Sonos app at the same time
