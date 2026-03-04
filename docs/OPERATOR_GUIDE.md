@@ -159,3 +159,10 @@ Playlist mode during shifts:
 ```bash
 sonosctl play-playlist "Chill Vibes" --speaker "Coffee Room" --shuffle
 ```
+
+Playback mode controls during shifts:
+
+```bash
+sonosctl shuffle on --speaker "Coffee Room"
+sonosctl repeat all --speaker "Coffee Room"
+```

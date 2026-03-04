@@ -139,6 +139,19 @@ sonosctl queue add "nujabes feather" --speaker "Coffee Room" --pick --limit 10
 sonosctl queue clear --speaker "Coffee Room"
 ```
 
+### Playback modes
+
+```bash
+sonosctl shuffle --speaker "Coffee Room"
+sonosctl shuffle on --speaker "Coffee Room"
+sonosctl shuffle off --speaker "Coffee Room"
+
+sonosctl repeat --speaker "Coffee Room"
+sonosctl repeat all --speaker "Coffee Room"
+sonosctl repeat one --speaker "Coffee Room"
+sonosctl repeat off --speaker "Coffee Room"
+```
+
 ## Configuration
 
 Default config path: `~/.sonosctl/config.toml`

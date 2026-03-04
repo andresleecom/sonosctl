@@ -25,6 +25,8 @@ Build and validate a local CLI tool to control Sonos speakers and Spotify playba
 - `playlists`
 - `play`
 - `play-playlist`
+- `shuffle`
+- `repeat`
 - `status`
 - `queue`
 - `group`
@@ -95,3 +97,4 @@ CLI now supports all formats and extracts `linkCode` from URL query when require
 - Added `status` command and fixed duplicate track-search call in `play`.
 - Added `queue` commands (list/add/clear) for non-interruptive queue management.
 - Added `play-playlist` command to start full Spotify playlists by name or ID.
+- Added `shuffle` and `repeat` commands with state-query and set-mode support.

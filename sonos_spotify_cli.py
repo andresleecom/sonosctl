@@ -498,6 +498,63 @@ def cmd_volume(args: argparse.Namespace) -> int:
     return 0
 
 
+def _repeat_mode_label(value: object) -> str:
+    if value == "ONE":
+        return "one"
+    if value is True:
+        return "all"
+    return "off"
+
+
+def cmd_shuffle(args: argparse.Namespace) -> int:
+    speaker = _with_speaker(args, "set shuffle")
+    if args.mode is None:
+        current = bool(speaker.shuffle)
+        if effective_json_flag(args):
+            print(
+                json.dumps(
+                    {
+                        "speaker": speaker.player_name or speaker.ip_address,
+                        "shuffle": current,
+                    },
+                    indent=2,
+                )
+            )
+            return 0
+        print(f'{speaker.player_name} shuffle: {"on" if current else "off"}')
+        return 0
+
+    desired = args.mode == "on"
+    speaker.shuffle = desired
+    print(f'{speaker.player_name} shuffle set to {"on" if desired else "off"}')
+    return 0
+
+
+def cmd_repeat(args: argparse.Namespace) -> int:
+    speaker = _with_speaker(args, "set repeat")
+    if args.mode is None:
+        current = _repeat_mode_label(speaker.repeat)
+        if effective_json_flag(args):
+            print(
+                json.dumps(
+                    {
+                        "speaker": speaker.player_name or speaker.ip_address,
+                        "repeat": current,
+                    },
+                    indent=2,
+                )
+            )
+            return 0
+        print(f"{speaker.player_name} repeat: {current}")
+        return 0
+
+    mapping = {"off": False, "all": True, "one": "ONE"}
+    desired = mapping[args.mode]
+    speaker.repeat = desired
+    print(f"{speaker.player_name} repeat set to {args.mode}")
+    return 0
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     speaker = _with_speaker(args, "get status")
     transport = speaker.get_current_transport_info()
@@ -835,6 +892,28 @@ def build_parser() -> argparse.ArgumentParser:
     )
     add_speaker_selection_args(play_playlist)
     play_playlist.set_defaults(func=cmd_play_playlist)
+
+    shuffle = subparsers.add_parser("shuffle", help="Show or set shuffle mode")
+    shuffle.add_argument("mode", nargs="?", choices=["on", "off"], help="Shuffle mode")
+    add_speaker_selection_args(shuffle)
+    shuffle.add_argument(
+        "--json",
+        action="store_true",
+        default=None,
+        help="Output JSON",
+    )
+    shuffle.set_defaults(func=cmd_shuffle)
+
+    repeat = subparsers.add_parser("repeat", help="Show or set repeat mode")
+    repeat.add_argument("mode", nargs="?", choices=["off", "all", "one"], help="Repeat mode")
+    add_speaker_selection_args(repeat)
+    repeat.add_argument(
+        "--json",
+        action="store_true",
+        default=None,
+        help="Output JSON",
+    )
+    repeat.set_defaults(func=cmd_repeat)
 
     queue = subparsers.add_parser("queue", help="View and manage playback queue")
     queue.add_argument("--limit", type=int, default=20, help="Max queue items to show")
