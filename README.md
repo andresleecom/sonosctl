@@ -13,6 +13,8 @@ Related documentation:
 - Search Spotify tracks through Sonos
 - Play tracks with optional interactive selection (`--pick`)
 - List Spotify playlists
+- Show live playback status (`status`)
+- View and manage playback queue (`queue`, `queue add`, `queue clear`)
 - Playback controls (`pause`, `resume`, `next`, `prev`)
 - Volume control
 - Multi-room grouping (`group`, `ungroup`)
@@ -99,6 +101,8 @@ sonosctl playlists --speaker "Coffee Room" --json
 ### Playback controls
 
 ```bash
+sonosctl status --speaker "Coffee Room"
+sonosctl status --speaker "Coffee Room" --json
 sonosctl pause --speaker "Coffee Room"
 sonosctl resume --speaker "Coffee Room"
 sonosctl next --speaker "Coffee Room"
@@ -113,6 +117,16 @@ sonosctl volume 35 --speaker "Coffee Room"
 sonosctl group --coordinator "Coffee Room" --members "Dining Room"
 sonosctl play "daft punk one more time" --speaker "Coffee Room" --pick
 sonosctl ungroup --speaker "Dining Room"
+```
+
+### Queue management
+
+```bash
+sonosctl queue --speaker "Coffee Room"
+sonosctl queue --speaker "Coffee Room" --json
+sonosctl queue add "nujabes feather" --speaker "Coffee Room"
+sonosctl queue add "nujabes feather" --speaker "Coffee Room" --pick --limit 10
+sonosctl queue clear --speaker "Coffee Room"
 ```
 
 ## Configuration

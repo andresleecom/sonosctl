@@ -38,6 +38,12 @@ Search without playing:
 sonosctl search "track name" --speaker "Coffee Room"
 ```
 
+Check current playback before transitions:
+
+```bash
+sonosctl status --speaker "Coffee Room"
+```
+
 Transport and volume:
 
 ```bash
@@ -139,4 +145,11 @@ sonosctl play "daft punk one more time" --speaker "Coffee Room" --pick
 sonosctl group --coordinator "Coffee Room" --members "Dining Room"
 sonosctl ungroup --speaker "Dining Room"
 sonosctl auth-spotify --speaker "Coffee Room"
+```
+
+Queue management during shifts:
+
+```bash
+sonosctl queue --speaker "Coffee Room"
+sonosctl queue add "track name" --speaker "Coffee Room"
 ```

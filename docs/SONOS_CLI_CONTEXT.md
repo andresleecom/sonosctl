@@ -24,6 +24,8 @@ Build and validate a local CLI tool to control Sonos speakers and Spotify playba
 - `search`
 - `playlists`
 - `play`
+- `status`
+- `queue`
 - `group`
 - `ungroup`
 - `auth-spotify`
@@ -43,6 +45,8 @@ Build and validate a local CLI tool to control Sonos speakers and Spotify playba
 - Config defaults in `~/.sonosctl/config.toml`
 - Speaker-scoped Spotify service usage for `search` and `play`
 - Multi-room grouping and ungrouping
+- Live playback status command (`status`) with JSON output
+- Queue management commands (`queue`, `queue add`, `queue clear`)
 
 ## Auth and Token Notes
 Observed error during development:
@@ -87,3 +91,5 @@ CLI now supports all formats and extracts `linkCode` from URL query when require
 - Added robust `auth-spotify` flow compatibility.
 - Added playlists and multi-room group operations.
 - Added deployment and operator documentation.
+- Added `status` command and fixed duplicate track-search call in `play`.
+- Added `queue` commands (list/add/clear) for non-interruptive queue management.

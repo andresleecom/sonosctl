@@ -419,7 +419,6 @@ def cmd_play(args: argparse.Namespace) -> int:
     search_limit = effective_search_limit(
         args, DEFAULT_PLAY_PICK_LIMIT if args.pick else DEFAULT_PLAY_NON_PICK_LIMIT
     )
-    tracks = search_tracks(term=args.query, limit=search_limit)
     tracks = search_tracks(term=args.query, limit=search_limit, device=speaker)
     if not tracks:
         print(f"No Spotify track found for query: {args.query}")
@@ -496,6 +495,140 @@ def cmd_volume(args: argparse.Namespace) -> int:
 
     speaker.volume = args.level
     print(f"{speaker.player_name} volume set to {args.level}")
+    return 0
+
+
+def cmd_status(args: argparse.Namespace) -> int:
+    speaker = _with_speaker(args, "get status")
+    transport = speaker.get_current_transport_info()
+    track = speaker.get_current_track_info()
+    media = speaker.get_current_media_info()
+
+    state = str(transport.get("current_transport_state", "UNKNOWN")).upper()
+    title = track.get("title") or "Unknown"
+    artist = track.get("artist") or "Unknown"
+    album = track.get("album") or "Unknown"
+    position = track.get("position") or "0:00:00"
+    duration = track.get("duration") or "0:00:00"
+    volume = int(speaker.volume)
+    source = media.get("channel") or media.get("uri") or "Unknown"
+
+    if effective_json_flag(args):
+        payload = {
+            "speaker": speaker.player_name or speaker.ip_address,
+            "state": state,
+            "track": title,
+            "artist": artist,
+            "album": album,
+            "position": position,
+            "duration": duration,
+            "volume": volume,
+            "source": source,
+        }
+        print(json.dumps(payload, indent=2))
+        return 0
+
+    print(f"Speaker: {speaker.player_name}")
+    print(f"State: {state}")
+    print(f"Track: {title}")
+    print(f"Artist: {artist}")
+    print(f"Album: {album}")
+    print(f"Position: {position} / {duration}")
+    print(f"Volume: {volume}")
+    print(f"Source: {source}")
+    return 0
+
+
+def _track_artist_album(item: object) -> tuple[str, str]:
+    artist = "Unknown"
+    album = "Unknown"
+
+    metadata = getattr(item, "metadata", None)
+    if metadata:
+        artist = _safe_getattr(metadata, "artist", artist)
+        if artist == "Unknown":
+            artist = _safe_getattr(metadata, "creator", artist)
+        album = _safe_getattr(metadata, "album", album)
+
+    if artist == "Unknown":
+        artist = _safe_getattr(item, "creator", artist)
+    if album == "Unknown":
+        album = _safe_getattr(item, "album", album)
+    return artist, album
+
+
+def cmd_queue_list(args: argparse.Namespace) -> int:
+    speaker = _with_speaker(args, "read queue")
+    queue_items = speaker.get_queue(start=args.offset, max_items=args.limit)
+    current_track = speaker.get_current_track_info()
+    current_position = current_track.get("playlist_position")
+
+    rows = []
+    for idx, item in enumerate(queue_items, start=args.offset + 1):
+        artist, album = _track_artist_album(item)
+        rows.append(
+            {
+                "position": idx,
+                "title": _safe_getattr(item, "title", "Unknown"),
+                "artist": artist,
+                "album": album,
+                "id": _safe_getattr(item, "item_id", ""),
+            }
+        )
+
+    if effective_json_flag(args):
+        payload = {
+            "speaker": speaker.player_name or speaker.ip_address,
+            "offset": args.offset,
+            "limit": args.limit,
+            "current_queue_position": current_position,
+            "items": rows,
+        }
+        print(json.dumps(payload, indent=2))
+        return 0
+
+    if not rows:
+        print(f"Queue is empty on {speaker.player_name}.")
+        return 0
+
+    print(f"Queue on {speaker.player_name}:")
+    for row in rows:
+        marker = ""
+        if current_position and str(row["position"]) == str(current_position):
+            marker = " >"
+        print(f'{row["position"]}. {row["title"]} - {row["artist"]} ({row["album"]}){marker}')
+    return 0
+
+
+def cmd_queue_add(args: argparse.Namespace) -> int:
+    speaker = _with_speaker(args, "add to queue")
+    search_limit = effective_search_limit(
+        args, DEFAULT_PLAY_PICK_LIMIT if args.pick else DEFAULT_PLAY_NON_PICK_LIMIT
+    )
+    tracks = search_tracks(term=args.query, limit=search_limit, device=speaker)
+    if not tracks:
+        print(f"No Spotify track found for query: {args.query}")
+        return 1
+
+    track = tracks[0]
+    if args.pick:
+        selected = prompt_track_selection(tracks)
+        if selected is None:
+            print("Canceled.")
+            return 0
+        track = selected
+
+    queue_position = speaker.add_to_queue(track.item)
+    print(
+        f"Added to queue on {speaker.player_name}: {track.title} - {track.artist} (position {queue_position})"
+    )
+    return 0
+
+
+def cmd_queue_clear(args: argparse.Namespace) -> int:
+    speaker = _with_speaker(args, "clear queue")
+    speaker.clear_queue()
+    print(f"Queue cleared on {speaker.player_name}")
     return 0
 
 
@@ -638,6 +771,40 @@ def build_parser() -> argparse.ArgumentParser:
     play.add_argument("--limit", type=int, default=None, help="Search result count (used by --pick)")
     add_speaker_selection_args(play)
     play.set_defaults(func=cmd_play)
+
+    queue = subparsers.add_parser("queue", help="View and manage playback queue")
+    queue.add_argument("--limit", type=int, default=20, help="Max queue items to show")
+    queue.add_argument("--offset", type=int, default=0, help="Queue offset")
+    add_speaker_selection_args(queue)
+    queue.add_argument(
+        "--json",
+        action="store_true",
+        default=None,
+        help="Output JSON",
+    )
+    queue_subparsers = queue.add_subparsers(dest="queue_command")
+    queue.set_defaults(func=cmd_queue_list)
+
+    queue_add = queue_subparsers.add_parser("add", help="Search and add a track to queue")
+    queue_add.add_argument("query", help="Track search query")
+    queue_add.add_argument("--limit", type=int, default=None, help="Search result count (used by --pick)")
+    queue_add.add_argument("--pick", action="store_true", help="Interactively pick from search results")
+    add_speaker_selection_args(queue_add)
+    queue_add.set_defaults(func=cmd_queue_add)
+
+    queue_clear = queue_subparsers.add_parser("clear", help="Clear current playback queue")
+    add_speaker_selection_args(queue_clear)
+    queue_clear.set_defaults(func=cmd_queue_clear)
+
+    status = subparsers.add_parser("status", help="Show current playback status")
+    add_speaker_selection_args(status)
+    status.add_argument(
+        "--json",
+        action="store_true",
+        default=None,
+        help="Output JSON",
+    )
+    status.set_defaults(func=cmd_status)
 
     group = subparsers.add_parser("group", help="Group speakers under a coordinator")
     group.add_argument("--coordinator", required=True, help="Coordinator speaker name")
