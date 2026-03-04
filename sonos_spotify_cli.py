@@ -555,6 +555,30 @@ def cmd_repeat(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_crossfade(args: argparse.Namespace) -> int:
+    speaker = _with_speaker(args, "set crossfade")
+    if args.mode is None:
+        current = bool(speaker.cross_fade)
+        if effective_json_flag(args):
+            print(
+                json.dumps(
+                    {
+                        "speaker": speaker.player_name or speaker.ip_address,
+                        "crossfade": current,
+                    },
+                    indent=2,
+                )
+            )
+            return 0
+        print(f'{speaker.player_name} crossfade: {"on" if current else "off"}')
+        return 0
+
+    desired = args.mode == "on"
+    speaker.cross_fade = desired
+    print(f'{speaker.player_name} crossfade set to {"on" if desired else "off"}')
+    return 0
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     speaker = _with_speaker(args, "get status")
     transport = speaker.get_current_transport_info()
@@ -914,6 +938,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output JSON",
     )
     repeat.set_defaults(func=cmd_repeat)
+
+    crossfade = subparsers.add_parser("crossfade", help="Show or set crossfade mode")
+    crossfade.add_argument("mode", nargs="?", choices=["on", "off"], help="Crossfade mode")
+    add_speaker_selection_args(crossfade)
+    crossfade.add_argument(
+        "--json",
+        action="store_true",
+        default=None,
+        help="Output JSON",
+    )
+    crossfade.set_defaults(func=cmd_crossfade)
 
     queue = subparsers.add_parser("queue", help="View and manage playback queue")
     queue.add_argument("--limit", type=int, default=20, help="Max queue items to show")

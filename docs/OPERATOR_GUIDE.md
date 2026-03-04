@@ -165,4 +165,5 @@ Playback mode controls during shifts:
 ```bash
 sonosctl shuffle on --speaker "Coffee Room"
 sonosctl repeat all --speaker "Coffee Room"
+sonosctl crossfade on --speaker "Coffee Room"
 ```

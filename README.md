@@ -17,6 +17,7 @@ Related documentation:
 - View and manage playback queue (`queue`, `queue add`, `queue clear`)
 - Play full Spotify playlists by name or ID (`play-playlist`)
 - Playback controls (`pause`, `resume`, `next`, `prev`)
+- Crossfade mode control (`crossfade`)
 - Volume control
 - Multi-room grouping (`group`, `ungroup`)
 - JSON output for scripting (`devices`, `search`, `playlists`)
@@ -150,6 +151,10 @@ sonosctl repeat --speaker "Coffee Room"
 sonosctl repeat all --speaker "Coffee Room"
 sonosctl repeat one --speaker "Coffee Room"
 sonosctl repeat off --speaker "Coffee Room"
+
+sonosctl crossfade --speaker "Coffee Room"
+sonosctl crossfade on --speaker "Coffee Room"
+sonosctl crossfade off --speaker "Coffee Room"
 ```
 
 ## Configuration

@@ -27,6 +27,7 @@ Build and validate a local CLI tool to control Sonos speakers and Spotify playba
 - `play-playlist`
 - `shuffle`
 - `repeat`
+- `crossfade`
 - `status`
 - `queue`
 - `group`
@@ -50,6 +51,7 @@ Build and validate a local CLI tool to control Sonos speakers and Spotify playba
 - Multi-room grouping and ungrouping
 - Live playback status command (`status`) with JSON output
 - Queue management commands (`queue`, `queue add`, `queue clear`)
+- Crossfade mode control (`crossfade`)
 
 ## Auth and Token Notes
 Observed error during development:
@@ -98,3 +100,4 @@ CLI now supports all formats and extracts `linkCode` from URL query when require
 - Added `queue` commands (list/add/clear) for non-interruptive queue management.
 - Added `play-playlist` command to start full Spotify playlists by name or ID.
 - Added `shuffle` and `repeat` commands with state-query and set-mode support.
+- Added `crossfade` command with state-query and on/off control.
