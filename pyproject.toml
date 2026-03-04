@@ -1,0 +1,12 @@
+[project]
+name = "sonos-spotify-cli"
+version = "0.1.0"
+description = "CLI to control Sonos speakers and play Spotify content on local network"
+requires-python = ">=3.10"
+dependencies = [
+  "soco>=0.30.6",
+  "tomli>=2.0.1; python_version < '3.11'"
+]
+
+[project.scripts]
+sonosctl = "sonos_spotify_cli:main"
