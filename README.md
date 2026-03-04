@@ -101,6 +101,7 @@ sonosctl play "bohemian rhapsody"
 |---------|-------------|
 | `search <query>` | Search Spotify tracks |
 | `playlists [query]` | List or search playlists |
+| `favorites [all\|playlists\|tracks] [query]` | List Sonos favorites, including favorite playlists and songs |
 
 ### Playback modes
 

@@ -20,6 +20,15 @@ class PlaylistResult:
 
 
 @dataclass
+class FavoriteResult:
+    title: str
+    kind: str
+    item_id: str
+    uri: str
+    item: object
+
+
+@dataclass
 class ConfigDefaults:
     speaker: str | None = None
     ip: str | None = None

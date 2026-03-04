@@ -1,5 +1,6 @@
 from sonosctl.commands.auth import cmd_auth_spotify
 from sonosctl.commands.devices import cmd_devices
+from sonosctl.commands.favorites import cmd_favorites
 from sonosctl.commands.group import cmd_group, cmd_ungroup
 from sonosctl.commands.modes import cmd_crossfade, cmd_repeat, cmd_shuffle
 from sonosctl.commands.playback import cmd_next, cmd_pause, cmd_play, cmd_prev, cmd_resume, cmd_status, cmd_volume
@@ -11,6 +12,7 @@ __all__ = [
     "cmd_auth_spotify",
     "cmd_crossfade",
     "cmd_devices",
+    "cmd_favorites",
     "cmd_group",
     "cmd_next",
     "cmd_pause",

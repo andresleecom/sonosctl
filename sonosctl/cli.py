@@ -8,6 +8,7 @@ from sonosctl.commands import (
     cmd_auth_spotify,
     cmd_crossfade,
     cmd_devices,
+    cmd_favorites,
     cmd_group,
     cmd_next,
     cmd_pause,
@@ -81,6 +82,26 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output JSON",
     )
     playlists.set_defaults(func=cmd_playlists)
+
+    favorites = subparsers.add_parser("favorites", help="List Sonos favorites")
+    favorites.add_argument(
+        "kind",
+        nargs="?",
+        default="all",
+        choices=["all", "playlists", "tracks"],
+        help="Filter favorites by type",
+    )
+    favorites.add_argument("query", nargs="?", default=None, help="Optional filter query")
+    favorites.add_argument("--limit", type=int, default=50, help="Max favorites to show")
+    favorites.add_argument("--offset", type=int, default=0, help="Favorites offset")
+    add_speaker_selection_args(favorites)
+    favorites.add_argument(
+        "--json",
+        action="store_true",
+        default=None,
+        help="Output JSON",
+    )
+    favorites.set_defaults(func=cmd_favorites)
 
     play = subparsers.add_parser("play", help="Search and play first Spotify match")
     play.add_argument("query", help="Track search query")

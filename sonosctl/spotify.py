@@ -4,7 +4,7 @@ from soco import SoCo
 from soco.music_services import MusicService
 
 from sonosctl.config import DEFAULT_SEARCH_LIMIT
-from sonosctl.types import PlaylistResult, TrackResult
+from sonosctl.types import FavoriteResult, PlaylistResult, TrackResult
 
 
 def spotify_service(device: SoCo | None = None) -> MusicService:
@@ -121,3 +121,59 @@ def track_artist_album(item: object) -> tuple[str, str]:
     if album == "Unknown":
         album = _safe_getattr(item, "album", album)
     return artist, album
+
+
+def _favorite_kind(item: object) -> str:
+    item_class = _safe_getattr(item, "item_class", "").lower()
+    ref = getattr(item, "reference", None)
+    ref_class = _safe_getattr(ref, "item_class", "").lower() if ref else ""
+    candidate = f"{item_class} {ref_class}"
+
+    if "playlist" in candidate:
+        return "playlist"
+    if "musictrack" in candidate or "track" in candidate:
+        return "track"
+    if "radio" in candidate or "audiobroadcast" in candidate:
+        return "radio"
+    if "album" in candidate:
+        return "album"
+    return "other"
+
+
+def list_favorites(
+    speaker: SoCo,
+    limit: int = 50,
+    offset: int = 0,
+    kind_filter: str = "all",
+    query: str = "",
+) -> list[FavoriteResult]:
+    result = speaker.music_library.get_sonos_favorites(start=offset, max_items=limit)
+    favorites: list[FavoriteResult] = []
+
+    for item in result:
+        kind = _favorite_kind(item)
+        title = _safe_getattr(item, "title", "Unknown")
+        item_id = _safe_getattr(item, "item_id", "")
+        uri = _safe_getattr(item, "uri", "")
+        if not uri:
+            uri = _safe_getattr(getattr(item, "reference", None), "uri", "")
+
+        favorites.append(
+            FavoriteResult(
+                title=title,
+                kind=kind,
+                item_id=item_id,
+                uri=uri,
+                item=item,
+            )
+        )
+
+    if kind_filter != "all":
+        target = "playlist" if kind_filter == "playlists" else "track"
+        favorites = [x for x in favorites if x.kind == target]
+
+    if query:
+        q = query.lower().strip()
+        favorites = [x for x in favorites if q in x.title.lower() or q in x.uri.lower()]
+
+    return favorites
