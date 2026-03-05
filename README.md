@@ -222,7 +222,7 @@ MIT - see [LICENSE](LICENSE).
 
 ---
 
-Made with love from Cancun, Mexico.
+Made with love from Cancun.
 
 
 
