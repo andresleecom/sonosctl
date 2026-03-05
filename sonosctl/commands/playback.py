@@ -19,6 +19,17 @@ from sonosctl.spotify import search_tracks
 from sonosctl.types import TrackResult
 
 
+def _clean_field(value: object, fallback: str = "Unknown") -> str:
+    if value is None:
+        return fallback
+    text = str(value).strip()
+    if not text:
+        return fallback
+    if text.upper() in {"NOT_IMPLEMENTED", "NONE", "N/A"}:
+        return fallback
+    return text
+
+
 def prompt_track_selection(tracks: Sequence[TrackResult]) -> TrackResult | None:
     for idx, track in enumerate(tracks, start=1):
         print(f"{idx}. {track.title} - {track.artist} ({track.album})")
@@ -117,14 +128,22 @@ def cmd_status(args: argparse.Namespace) -> int:
     track = speaker.get_current_track_info()
     media = speaker.get_current_media_info()
 
-    state = str(transport.get("current_transport_state", "UNKNOWN")).upper()
-    title = track.get("title") or "Unknown"
-    artist = track.get("artist") or "Unknown"
-    album = track.get("album") or "Unknown"
-    position = track.get("position") or "0:00:00"
-    duration = track.get("duration") or "0:00:00"
+    state = _clean_field(transport.get("current_transport_state"), "UNKNOWN").upper()
+    title = _clean_field(track.get("title"))
+    artist = _clean_field(track.get("artist"), _clean_field(track.get("creator")))
+    album = _clean_field(track.get("album"))
+    position = _clean_field(track.get("position"), "0:00:00")
+    duration = _clean_field(track.get("duration"), "0:00:00")
     volume = int(speaker.volume)
-    source = media.get("channel") or media.get("uri") or "Unknown"
+    source = _clean_field(media.get("channel"), _clean_field(media.get("uri")))
+
+    # Fallbacks that improve metadata when Sonos leaves fields blank.
+    if title == "Unknown":
+        title = _clean_field(media.get("channel"), title)
+    if title == "Unknown":
+        title = _clean_field(track.get("stream_content"), title)
+    if artist == "Unknown":
+        artist = _clean_field(track.get("stream_content"), artist)
 
     if effective_json_flag(args):
         payload = {
@@ -138,6 +157,12 @@ def cmd_status(args: argparse.Namespace) -> int:
             "volume": volume,
             "source": source,
         }
+        if args.raw:
+            payload["raw"] = {
+                "transport": transport,
+                "track": track,
+                "media": media,
+            }
         print(json.dumps(payload, indent=2))
         return 0
 
@@ -149,4 +174,12 @@ def cmd_status(args: argparse.Namespace) -> int:
     print(f"Position: {position} / {duration}")
     print(f"Volume: {volume}")
     print(f"Source: {source}")
+    if args.raw:
+        print("")
+        print("Raw transport:")
+        print(json.dumps(transport, indent=2))
+        print("Raw track:")
+        print(json.dumps(track, indent=2))
+        print("Raw media:")
+        print(json.dumps(media, indent=2))
     return 0

@@ -7,9 +7,11 @@ from typing import Iterable
 from sonosctl.commands import (
     cmd_auth_spotify,
     cmd_crossfade,
+    cmd_doctor_status,
     cmd_devices,
     cmd_favorites,
     cmd_group,
+    cmd_groups,
     cmd_next,
     cmd_pause,
     cmd_play,
@@ -193,6 +195,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Output JSON",
     )
+    status.add_argument(
+        "--raw",
+        action="store_true",
+        help="Include raw Sonos response payloads (debug)",
+    )
     status.set_defaults(func=cmd_status)
 
     group = subparsers.add_parser("group", help="Group speakers under a coordinator")
@@ -203,12 +210,31 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Speaker names to join the coordinator group",
     )
+    group.add_argument("--wait", type=float, default=2.0, help="Seconds to wait for group confirmation")
     group.add_argument("--timeout", type=int, default=None, help="Discovery timeout in seconds")
     group.set_defaults(func=cmd_group)
 
     ungroup = subparsers.add_parser("ungroup", help="Remove a speaker from its group")
     add_speaker_selection_args(ungroup)
+    ungroup.add_argument("--wait", type=float, default=2.0, help="Seconds to wait for ungroup confirmation")
     ungroup.set_defaults(func=cmd_ungroup)
+
+    groups = subparsers.add_parser("groups", help="Show current Sonos group topology")
+    groups.add_argument("--timeout", type=int, default=None, help="Discovery timeout in seconds")
+    groups.add_argument("--json", action="store_true", default=None, help="Output JSON")
+    groups.set_defaults(func=cmd_groups)
+
+    doctor = subparsers.add_parser("doctor", help="Diagnostics tools")
+    doctor_subparsers = doctor.add_subparsers(dest="doctor_command", required=True)
+
+    doctor_status = doctor_subparsers.add_parser("status", help="Analyze captured status --json --raw output")
+    doctor_status.add_argument(
+        "--input",
+        default="status-debug.jsonl",
+        help="Path to captured status file (concatenated JSON documents)",
+    )
+    doctor_status.add_argument("--samples", type=int, default=5, help="How many Unknown samples to print")
+    doctor_status.set_defaults(func=cmd_doctor_status)
 
     auth = subparsers.add_parser("auth-spotify", help="Run one-time Spotify auth for this CLI")
     add_speaker_selection_args(auth)

@@ -26,8 +26,9 @@ sonosctl/
     |-- __init__.py      # Re-exports all cmd_* handlers
     |-- auth.py          # cmd_auth_spotify
     |-- devices.py       # cmd_devices
+    |-- doctor.py        # cmd_doctor_status
     |-- favorites.py     # cmd_favorites
-    |-- group.py         # cmd_group, cmd_ungroup
+    |-- group.py         # cmd_group, cmd_ungroup, cmd_groups
     |-- modes.py         # cmd_shuffle, cmd_repeat, cmd_crossfade
     |-- playback.py      # cmd_play, cmd_pause, cmd_resume, cmd_next, cmd_prev, cmd_volume, cmd_status
     |-- playlist.py      # cmd_play_playlist
@@ -87,9 +88,9 @@ SoCo `MusicService` handles Spotify interactions through Sonos integration:
 
 `favorites` is sourced from Sonos Favorites (`speaker.music_library.get_sonos_favorites`) and supports filtering for favorite playlists and favorite tracks.
 
-## Commands (19)
+## Commands (21)
 
-`devices`, `search`, `playlists`, `favorites`, `play`, `play-playlist`, `shuffle`, `repeat`, `crossfade`, `status`, `queue` (list/add/clear), `group`, `ungroup`, `auth-spotify`, `pause`, `resume`, `next`, `prev`, `volume`
+`devices`, `search`, `playlists`, `favorites`, `play`, `play-playlist`, `shuffle`, `repeat`, `crossfade`, `status`, `queue` (list/add/clear), `group`, `ungroup`, `groups`, `doctor status`, `auth-spotify`, `pause`, `resume`, `next`, `prev`, `volume`
 
 ## Known Limitations
 

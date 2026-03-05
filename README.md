@@ -1,9 +1,15 @@
-# sonosctl
+﻿# sonosctl
 
 Control your Sonos speakers and Spotify from the terminal.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+<p align="center">
+  <img src="docs/assets/sonosctl.png" alt="Clawde the DJ Lobster" width="180" />
+</p>
+
+<p align="center"><em>Command the vibe.</em></p>
 
 ```
 $ sonosctl devices
@@ -118,6 +124,8 @@ sonosctl play "bohemian rhapsody"
 | `devices` | Discover speakers on your network |
 | `group` | Group speakers for synchronized playback |
 | `ungroup` | Remove a speaker from its group |
+| `groups` | Show current Sonos group topology |
+| `doctor status` | Analyze captured `status --json --raw` diagnostics |
 | `auth-spotify` | One-time Spotify authorization |
 
 Most commands accept `--speaker`, `--json`, and `--timeout`. Run `sonosctl <command> --help` for details.
@@ -156,11 +164,29 @@ Pair it with cron for scheduled playback:
 
 ## Troubleshooting
 
-**`AuthTokenExpired`** — Re-run `sonosctl auth-spotify --speaker "Living Room"`.
+**`AuthTokenExpired`** - Re-run `sonosctl auth-spotify --speaker "Living Room"`.
 
-**No speakers found** — Verify same LAN/VLAN, disable VPN, try `sonosctl devices --timeout 15`.
+**No speakers found** - Verify same LAN/VLAN, disable VPN, try `sonosctl devices --timeout 15`.
 
-**Auth link not working** — Run `auth-spotify` again and use the new code immediately.
+**Auth link not working** - Run `auth-spotify` again and use the new code immediately.
+
+**Group/ungroup looks stuck** - verify actual topology and use wait-confirmation:
+
+```bash
+sonosctl group --coordinator "Living Room" --members "Office" --wait 3
+sonosctl ungroup --speaker "Office" --wait 3
+sonosctl groups
+```
+
+**`status` returns `Unknown` intermittently** - capture raw payloads and run diagnostics:
+
+```bash
+# collect
+1..60 | % { python -m sonosctl status --speaker "Living Room" --json --raw; Start-Sleep 2 } | Set-Content status-debug.jsonl
+
+# analyze
+python -m sonosctl doctor status --input status-debug.jsonl --samples 10
+```
 
 ## Requirements
 
@@ -186,3 +212,4 @@ MIT - see [LICENSE](LICENSE).
 ---
 
 Made with love from Cancun, Mexico.
+

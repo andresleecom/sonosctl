@@ -11,6 +11,8 @@ can call commands in non-interactive mode and parse JSON responses.
   - `sonosctl status --json --speaker "Living Room"`
 - Queue state:
   - `sonosctl queue --json --speaker "Living Room"`
+- Group topology:
+  - `sonosctl groups --json`
 - Search candidates:
   - `sonosctl search "query" --json --speaker "Living Room"`
 - Playlist catalog:
@@ -28,6 +30,7 @@ can call commands in non-interactive mode and parse JSON responses.
   2. `queue --json`
   3. decide action
 - Treat non-zero exit codes as command failure.
+- For flaky metadata, capture raw payloads with `status --json --raw` and analyze with `doctor status`.
 
 ## Safe operation guidelines
 
@@ -39,6 +42,7 @@ can call commands in non-interactive mode and parse JSON responses.
 
 ```bash
 sonosctl devices --json
+sonosctl groups --json
 sonosctl status --json --speaker "Living Room"
 sonosctl play-playlist "Morning Chill" --speaker "Living Room" --shuffle
 sonosctl queue --json --speaker "Living Room"
