@@ -1,9 +1,12 @@
-﻿# sonosctl
+# sonosctl
 
-Control your Sonos speakers and Spotify from the terminal.
+Programmable home audio.
 
-> sonosctl is an independent tool created by Andres Lee for personal automation workflows. It is not made by, affiliated with, endorsed by, or sponsored by Sonos or Spotify.
+`sonosctl` is a terminal-first, local-first CLI for controlling Sonos speakers and Spotify from scripts, cron jobs, shortcuts, and AI agents.
 
+It is built for people who want home audio to be automatable, composable, and easy to integrate into local workflows.
+
+> `sonosctl` is an independent open source project by Andres Lee. It is not affiliated with, endorsed by, or sponsored by Sonos or Spotify.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -15,15 +18,15 @@ Control your Sonos speakers and Spotify from the terminal.
 
 <p align="center"><em>Command the vibe.</em></p>
 
-```
+```bash
 $ sonosctl devices
 Living Room | 192.168.68.110 | Sonos One
 Office      | 192.168.68.106 | Sonos One
 
 $ sonosctl play "nujabes feather" --speaker "Living Room"
-Now playing on Living Room: Feather - Nujabes (Modal Soul)
+Now playing on Living Room: Feather - Nujabes
 
-$ sonosctl status
+$ sonosctl status --speaker "Living Room"
 Speaker: Living Room
 State: PLAYING
 Track: Feather
@@ -31,13 +34,39 @@ Artist: Nujabes
 Album: Modal Soul
 Position: 0:01:23 / 0:04:47
 Volume: 25
+Source: x-sonos-spotify:spotify%3atrack%3a...
 
-$ sonosctl queue add "khruangbin evan finds the third room"
-Added to queue: Evan Finds the Third Room - Khruangbin
+$ sonosctl queue add "khruangbin evan finds the third room" --speaker "Living Room"
+Added to queue on Living Room: Evan Finds the Third Room - Khruangbin (position 12)
 
 $ sonosctl group --coordinator "Living Room" --members "Office"
-Grouped: Office -> Living Room
+Grouped with coordinator Living Room: Office
 ```
+
+## Why sonosctl?
+
+Most Sonos control flows are built for apps and taps.
+
+`sonosctl` is built for automation.
+
+Use it when you want to:
+
+- start music from a shell script
+- trigger playback from cron
+- wire Sonos into Raycast, Shortcuts, Stream Deck, or Alfred
+- expose local speaker control to AI agents
+- inspect playback state as JSON
+- manage speakers from a terminal without opening the Sonos app
+
+## Features
+
+- Discover Sonos speakers on your LAN
+- Play tracks and playlists from Spotify through Sonos
+- Read playback state, queue contents, and group topology
+- Group and ungroup rooms
+- Toggle shuffle, repeat, and crossfade
+- Output JSON on automation-oriented commands
+- Run locally with no Spotify developer API keys
 
 ## Install
 
@@ -56,31 +85,75 @@ From source:
 ```bash
 git clone https://github.com/andresleecom/sonosctl.git
 cd sonosctl
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -e .
 ```
 
-## Quick start
+## Quick Start
 
-**1. Discover speakers**
+### 1. Discover speakers
 
 ```bash
 sonosctl devices
 ```
 
-**2. Authenticate Spotify** (one-time per speaker)
+### 2. Authenticate Spotify
+
+Spotify auth is usually a one-time setup per Sonos household.
 
 ```bash
 sonosctl auth-spotify --speaker "Living Room"
 ```
 
-Open the link, authorize, then press Enter.
+Open the link, approve access, then press Enter to complete linking.
 
-**3. Play something**
+### 3. Play something
 
 ```bash
-sonosctl play "bohemian rhapsody"
+sonosctl play "bohemian rhapsody" --speaker "Living Room"
 ```
+
+### 4. Use JSON in scripts
+
+```bash
+sonosctl status --speaker "Living Room" --json | jq '.track'
+sonosctl queue --speaker "Living Room" --json | jq '.items[].title'
+```
+
+## Automation Use Cases
+
+### Cron
+
+```bash
+# Morning playlist at 8 AM
+0 8 * * * sonosctl play-playlist "Morning Chill" --speaker "Living Room" --shuffle
+
+# Lower volume at 10 PM
+0 22 * * * sonosctl volume 10 --speaker "Living Room"
+```
+
+### Shell scripts
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+current_track="$(sonosctl status --speaker "Living Room" --json | jq -r '.track')"
+echo "Now playing: $current_track"
+```
+
+### AI agents and local tools
+
+`sonosctl` works well as a thin control layer for:
+
+- local AI agents
+- Raycast scripts
+- Stream Deck actions
+- Apple Shortcuts
+- shell aliases and desktop automations
+
+See [docs/AI_AGENT_INTEGRATION.md](docs/AI_AGENT_INTEGRATION.md).
 
 ## Commands
 
@@ -88,51 +161,52 @@ sonosctl play "bohemian rhapsody"
 
 | Command | Description |
 |---------|-------------|
-| `play <query>` | Search and play a track |
-| `play-playlist <name>` | Play a Spotify playlist by name |
+| `play <query>` | Search and play the first Spotify track match |
+| `play-playlist <name-or-id>` | Play a Spotify playlist by name or item ID |
 | `pause` | Pause playback |
 | `resume` | Resume playback |
 | `next` | Skip to next track |
-| `prev` | Previous track |
+| `prev` | Go to previous track |
 | `volume [level]` | Get or set volume (0-100) |
-| `status` | Show current track, position, volume |
+| `status` | Show current playback state and metadata |
 
 ### Queue
 
 | Command | Description |
 |---------|-------------|
 | `queue` | Show playback queue |
-| `queue add <query>` | Add a track without interrupting |
+| `queue add <query>` | Add a Spotify track to the queue |
 | `queue clear` | Clear the queue |
 
-### Search & Browse
+### Search and Browse
 
 | Command | Description |
 |---------|-------------|
 | `search <query>` | Search Spotify tracks |
-| `playlists [query]` | List or search playlists |
-| `favorites [all\|playlists\|tracks] [query]` | List Sonos favorites, including favorite playlists and songs |
+| `playlists [query]` | List or filter playlists |
+| `playlist-info <name-or-id>` | Show playlist metadata and tracks |
+| `favorites [all\|playlists\|tracks] [query]` | List Sonos favorites |
 
-### Playback modes
+### Playback Modes
 
 | Command | Description |
 |---------|-------------|
-| `shuffle [on\|off]` | Toggle shuffle mode |
-| `repeat [off\|one\|all]` | Set repeat mode |
-| `crossfade [on\|off]` | Toggle crossfade between tracks |
+| `shuffle [on\|off]` | Show or set shuffle mode |
+| `repeat [off\|one\|all]` | Show or set repeat mode |
+| `crossfade [on\|off]` | Show or set crossfade mode |
 
-### Multi-room & Setup
+### Multi-room and Diagnostics
 
 | Command | Description |
 |---------|-------------|
 | `devices` | Discover speakers on your network |
-| `group` | Group speakers for synchronized playback |
+| `group` | Group speakers under a coordinator |
 | `ungroup` | Remove a speaker from its group |
 | `groups` | Show current Sonos group topology |
 | `doctor status` | Analyze captured `status --json --raw` diagnostics |
-| `auth-spotify` | One-time Spotify authorization |
+| `auth-spotify` | Run Spotify linking flow through Sonos |
 
-Most commands accept `--speaker`, `--json`, and `--timeout`. Run `sonosctl <command> --help` for details.
+Run `sonosctl <command> --help` for details.
 
 ## Configuration
 
@@ -143,38 +217,61 @@ Create `~/.sonosctl/config.toml` to set defaults:
 speaker = "Living Room"
 timeout = 5
 search_limit = 8
+json = true
 ```
 
-With a default speaker configured, you can omit `--speaker` from all commands.
+With a default speaker configured, you can omit `--speaker` from commands that target a specific device.
 
-## Automation
+## JSON Output
 
-sonosctl is designed for scripting and automation. JSON output on every major command:
+These commands support `--json` for automation workflows:
+
+- `devices`
+- `search`
+- `playlists`
+- `favorites`
+- `playlist-info`
+- `shuffle`
+- `repeat`
+- `crossfade`
+- `queue`
+- `status`
+- `groups`
+
+Example:
 
 ```bash
-sonosctl status --json | jq '.track'
-sonosctl queue --json | jq '.items[].title'
-```
-
-Pair it with cron for scheduled playback:
-
-```bash
-# Morning playlist at 8 AM
-0 8 * * * sonosctl play-playlist "Morning Chill" --shuffle
-
-# Lower volume at 10 PM
-0 22 * * * sonosctl volume 10
+sonosctl status --speaker "Living Room" --json
+sonosctl devices --json
 ```
 
 ## Troubleshooting
 
-**`AuthTokenExpired`** - Re-run `sonosctl auth-spotify --speaker "Living Room"`.
+**`AuthTokenExpired`**
 
-**No speakers found** - Verify same LAN/VLAN, disable VPN, try `sonosctl devices --timeout 15`.
+Re-run:
 
-**Auth link not working** - Run `auth-spotify` again and use the new code immediately.
+```bash
+sonosctl auth-spotify --speaker "Living Room"
+```
 
-**Group/ungroup looks stuck** - verify actual topology and use wait-confirmation:
+**No speakers found**
+
+Verify the speaker is online, on the same LAN/VLAN, and that a VPN is not interfering.
+
+Try:
+
+```bash
+sonosctl devices --timeout 15
+```
+
+**Auth link not working**
+
+Run `auth-spotify` again and use the new code immediately.
+
+**Group or ungroup looks stuck**
+
+Verify actual topology and use wait confirmation:
 
 ```bash
 sonosctl group --coordinator "Living Room" --members "Office" --wait 3
@@ -182,13 +279,16 @@ sonosctl ungroup --speaker "Office" --wait 3
 sonosctl groups
 ```
 
-**`status` returns `Unknown` intermittently** - capture raw payloads and run diagnostics:
+**`status` returns `Unknown` intermittently**
+
+Capture raw payloads and run diagnostics:
 
 ```bash
-# collect
-1..60 | % { python -m sonosctl status --speaker "Living Room" --json --raw; Start-Sleep 2 } | Set-Content status-debug.jsonl
+for i in $(seq 1 60); do
+  python -m sonosctl status --speaker "Living Room" --json --raw
+  sleep 2
+done > status-debug.jsonl
 
-# analyze
 python -m sonosctl doctor status --input status-debug.jsonl --samples 10
 ```
 
@@ -198,31 +298,26 @@ python -m sonosctl doctor status --input status-debug.jsonl --samples 10
 - Sonos speakers on the same local network
 - Spotify linked in the Sonos app
 
-## Contributing
+## Project Docs
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Open Source Project Files
-
+- [CONTRIBUTING.md](CONTRIBUTING.md)
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - [SECURITY.md](SECURITY.md)
 - [CHANGELOG.md](CHANGELOG.md)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [docs/AI_AGENT_INTEGRATION.md](docs/AI_AGENT_INTEGRATION.md)
+- [docs/HARDENING_CHECKLIST.md](docs/HARDENING_CHECKLIST.md)
 
 ## Independence Notice
 
-sonosctl is completely independent from Sonos and Spotify.
-It was built by Andres Lee to solve real-world personal automation problems.
+`sonosctl` is completely independent from Sonos and Spotify.
 
 All product and company names, including Sonos and Spotify, are trademarks of their respective owners.
 
 ## License
 
-MIT - see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 
 ---
 
-Made with love from Cancun.
-
-
-
+Built by Andres Lee in Cancun.

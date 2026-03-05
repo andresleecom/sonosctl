@@ -16,6 +16,7 @@ from sonosctl.commands import (
     cmd_pause,
     cmd_play,
     cmd_play_playlist,
+    cmd_playlist_info,
     cmd_playlists,
     cmd_prev,
     cmd_queue_add,
@@ -129,6 +130,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     add_speaker_selection_args(play_playlist)
     play_playlist.set_defaults(func=cmd_play_playlist)
+
+    playlist_info = subparsers.add_parser("playlist-info", help="Show playlist details and track listing")
+    playlist_info.add_argument("selector", help="Playlist name or playlist item ID")
+    playlist_info.add_argument("--limit", type=int, default=20, help="Search result count for lookup")
+    add_speaker_selection_args(playlist_info)
+    playlist_info.add_argument("--json", action="store_true", default=None, help="Output JSON")
+    playlist_info.set_defaults(func=cmd_playlist_info)
 
     shuffle = subparsers.add_parser("shuffle", help="Show or set shuffle mode")
     shuffle.add_argument("mode", nargs="?", choices=["on", "off"], help="Shuffle mode")
