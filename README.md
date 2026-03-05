@@ -141,7 +141,7 @@ sonosctl is designed for scripting and automation. JSON output on every major co
 
 ```bash
 sonosctl status --json | jq '.track'
-sonosctl queue --json | jq '.queue[].title'
+sonosctl queue --json | jq '.items[].title'
 ```
 
 Pair it with cron for scheduled playback:
@@ -171,6 +171,13 @@ Pair it with cron for scheduled playback:
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Open Source Project Files
+
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- [SECURITY.md](SECURITY.md)
+- [CHANGELOG.md](CHANGELOG.md)
+- [docs/AI_AGENT_INTEGRATION.md](docs/AI_AGENT_INTEGRATION.md)
 
 ## License
 

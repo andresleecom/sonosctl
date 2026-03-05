@@ -1,5 +1,9 @@
 # Contributing
 
+## Community standards
+
+By participating, you agree to follow [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
 ## Setup
 
 ```bash
@@ -40,3 +44,11 @@ Open an issue on [GitHub](https://github.com/andresleecom/sonosctl/issues). Incl
 - Error output
 
 For security issues, see [SECURITY.md](SECURITY.md).
+
+## Documentation expectations
+
+If your change affects command behavior, update at least one of:
+
+- `README.md`
+- `docs/ARCHITECTURE.md`
+- `docs/AI_AGENT_INTEGRATION.md` (for automation/agent behavior changes)

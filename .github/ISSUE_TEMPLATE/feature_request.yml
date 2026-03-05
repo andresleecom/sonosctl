@@ -1,0 +1,40 @@
+﻿name: Feature request
+description: Propose a new capability for sonosctl
+labels: [enhancement]
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: Add command to ...
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What user/operator problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: CLI syntax, flags, and expected output.
+      placeholder: |
+        sonosctl new-command --speaker "Living Room"
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I verified this is not already implemented.
+          required: true
+        - label: I included command examples.
+          required: true
