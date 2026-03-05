@@ -122,11 +122,27 @@ def cmd_volume(args: argparse.Namespace) -> int:
     return 0
 
 
+def _resolve_coordinator(speaker: object) -> object | None:
+    """If speaker is a group member, return the coordinator; else None."""
+    group = getattr(speaker, "group", None)
+    if not group:
+        return None
+    coordinator = getattr(group, "coordinator", None)
+    if not coordinator:
+        return None
+    if getattr(coordinator, "ip_address", None) == getattr(speaker, "ip_address", None):
+        return None  # speaker IS the coordinator
+    return coordinator
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     speaker = with_speaker(args, "get status")
-    transport = speaker.get_current_transport_info()
-    track = speaker.get_current_track_info()
-    media = speaker.get_current_media_info()
+    coordinator = _resolve_coordinator(speaker)
+    metadata_source = coordinator if coordinator else speaker
+
+    transport = metadata_source.get_current_transport_info()
+    track = metadata_source.get_current_track_info()
+    media = metadata_source.get_current_media_info()
 
     state = _clean_field(transport.get("current_transport_state"), "UNKNOWN").upper()
     title = _clean_field(track.get("title"))
@@ -136,6 +152,10 @@ def cmd_status(args: argparse.Namespace) -> int:
     duration = _clean_field(track.get("duration"), "0:00:00")
     volume = int(speaker.volume)
     source = _clean_field(media.get("channel"), _clean_field(media.get("uri")))
+
+    coordinator_name = None
+    if coordinator:
+        coordinator_name = getattr(coordinator, "player_name", None) or getattr(coordinator, "ip_address", "Unknown")
 
     # Fallbacks that improve metadata when Sonos leaves fields blank.
     if title == "Unknown":
@@ -157,6 +177,8 @@ def cmd_status(args: argparse.Namespace) -> int:
             "volume": volume,
             "source": source,
         }
+        if coordinator_name:
+            payload["group_coordinator"] = coordinator_name
         if args.raw:
             payload["raw"] = {
                 "transport": transport,
@@ -167,6 +189,8 @@ def cmd_status(args: argparse.Namespace) -> int:
         return 0
 
     print(f"Speaker: {speaker.player_name}")
+    if coordinator_name:
+        print(f"Group coordinator: {coordinator_name}")
     print(f"State: {state}")
     print(f"Track: {title}")
     print(f"Artist: {artist}")
