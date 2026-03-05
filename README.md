@@ -2,6 +2,9 @@
 
 Control your Sonos speakers and Spotify from the terminal.
 
+> sonosctl is an independent tool created by Andres Lee for personal automation workflows. It is not made by, affiliated with, endorsed by, or sponsored by Sonos or Spotify.
+
+
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -205,6 +208,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 - [CHANGELOG.md](CHANGELOG.md)
 - [docs/AI_AGENT_INTEGRATION.md](docs/AI_AGENT_INTEGRATION.md)
 
+## Independence Notice
+
+sonosctl is completely independent from Sonos and Spotify.
+It was built by Andres Lee to solve real-world personal automation problems.
+
+All product and company names, including Sonos and Spotify, are trademarks of their respective owners.
+
 ## License
 
 MIT - see [LICENSE](LICENSE).
@@ -212,4 +222,5 @@ MIT - see [LICENSE](LICENSE).
 ---
 
 Made with love from Cancun, Mexico.
+
 
