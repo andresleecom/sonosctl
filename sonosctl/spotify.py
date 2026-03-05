@@ -105,6 +105,49 @@ def list_playlists(
     return items[:limit]
 
 
+def get_playlist_tracks(
+    playlist_id: str,
+    device: SoCo | None = None,
+) -> list[dict]:
+    service = spotify_service(device=device)
+    tracks: list[dict] = []
+    index = 0
+    count = 100
+
+    while True:
+        result = service.get_metadata(item=playlist_id, index=index, count=count)
+        batch = list(result)
+        if not batch:
+            break
+        for item in batch:
+            title = _safe_getattr(item, "title", "Unknown")
+            artist = "Unknown"
+            album = "Unknown"
+            duration_seconds = 0
+
+            tmd = getattr(item, "track_metadata", None)
+            md = getattr(tmd, "metadata", None) if tmd else None
+            if isinstance(md, dict):
+                artist = md.get("artist", artist) or artist
+                album = md.get("album", album) or album
+                try:
+                    duration_seconds = int(md.get("duration", 0))
+                except (ValueError, TypeError):
+                    pass
+
+            tracks.append({
+                "title": title,
+                "artist": artist,
+                "album": album,
+                "duration_seconds": duration_seconds,
+            })
+        if len(batch) < count:
+            break
+        index += len(batch)
+
+    return tracks
+
+
 def track_artist_album(item: object) -> tuple[str, str]:
     artist = "Unknown"
     album = "Unknown"
