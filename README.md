@@ -7,6 +7,7 @@ Control your Sonos speakers and Spotify from the terminal.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![CI](https://github.com/andresleecom/sonosctl/actions/workflows/ci.yml/badge.svg)](https://github.com/andresleecom/sonosctl/actions/workflows/ci.yml)
 
 <p align="center">
   <img src="docs/assets/sonosctl.png" alt="Clawde the DJ Lobster" width="180" />
@@ -222,5 +223,6 @@ MIT - see [LICENSE](LICENSE).
 ---
 
 Made with love from Cancun, Mexico.
+
 
 
