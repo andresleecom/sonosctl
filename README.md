@@ -63,6 +63,7 @@ Use it when you want to:
 - Discover Sonos speakers on your LAN
 - Play tracks and playlists from Spotify through Sonos
 - Read playback state, queue contents, and group topology
+- Persist recently observed playback history for automation
 - Group and ungroup rooms
 - Toggle shuffle, repeat, and crossfade
 - Output JSON on automation-oriented commands
@@ -119,6 +120,15 @@ sonosctl play "bohemian rhapsody" --speaker "Living Room"
 ```bash
 sonosctl status --speaker "Living Room" --json | jq '.track'
 sonosctl queue --speaker "Living Room" --json | jq '.items[].title'
+sonosctl history --speaker "Living Room" --json | jq '.entries[-5:]'
+```
+
+### 5. Keep playback memory alive
+
+Run a lightweight monitor to keep `~/.sonosctl/history.jsonl` updated automatically:
+
+```bash
+sonosctl monitor --speaker "Living Room" --interval 15
 ```
 
 ## Automation Use Cases
@@ -155,6 +165,18 @@ echo "Now playing: $current_track"
 
 See [docs/AI_AGENT_INTEGRATION.md](docs/AI_AGENT_INTEGRATION.md).
 
+### Playback memory
+
+`sonosctl` can keep a lightweight playback history for agents and automations.
+
+```bash
+sonosctl history --speaker "Living Room"
+sonosctl history --speaker "Living Room" --json
+sonosctl monitor --speaker "Living Room" --interval 15
+```
+
+Use this when you want an agent to avoid repeating the same tracks or artists too often.
+
 ## Commands
 
 ### Playback
@@ -177,6 +199,13 @@ See [docs/AI_AGENT_INTEGRATION.md](docs/AI_AGENT_INTEGRATION.md).
 | `queue` | Show playback queue |
 | `queue add <query>` | Add a Spotify track to the queue |
 | `queue clear` | Clear the queue |
+
+### History and Monitoring
+
+| Command | Description |
+|---------|-------------|
+| `history` | Show recently observed playback history |
+| `monitor` | Continuously observe playback and append history |
 
 ### Search and Browse
 
@@ -235,6 +264,7 @@ These commands support `--json` for automation workflows:
 - `repeat`
 - `crossfade`
 - `queue`
+- `history`
 - `status`
 - `groups`
 
@@ -243,6 +273,7 @@ Example:
 ```bash
 sonosctl status --speaker "Living Room" --json
 sonosctl devices --json
+sonosctl history --speaker "Living Room" --json
 ```
 
 ## Troubleshooting

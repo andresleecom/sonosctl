@@ -12,6 +12,8 @@ from sonosctl.commands import (
     cmd_favorites,
     cmd_group,
     cmd_groups,
+    cmd_history,
+    cmd_monitor,
     cmd_next,
     cmd_pause,
     cmd_play,
@@ -105,6 +107,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output JSON",
     )
     favorites.set_defaults(func=cmd_favorites)
+
+    history = subparsers.add_parser("history", help="Show recently observed playback history")
+    history.add_argument("--limit", type=int, default=20, help="Max history entries to show")
+    history.add_argument("--speaker", default=None, help="Filter history to a speaker name")
+    history.add_argument("--json", action="store_true", default=None, help="Output JSON")
+    history.set_defaults(func=cmd_history)
+
+    monitor = subparsers.add_parser("monitor", help="Continuously observe playback and append history")
+    add_speaker_selection_args(monitor)
+    monitor.add_argument("--interval", type=float, default=15.0, help="Polling interval in seconds")
+    monitor.add_argument("--json", action="store_true", default=None, help="Output JSON entries as they are observed")
+    monitor.set_defaults(func=cmd_monitor)
 
     play = subparsers.add_parser("play", help="Search and play first Spotify match")
     play.add_argument("query", help="Track search query")
