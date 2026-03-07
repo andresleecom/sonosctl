@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from sonosctl.config import config_dir
@@ -92,7 +92,7 @@ def append_playback_history(
     _ensure_parent_dir(path)
 
     entry = PlaybackHistoryEntry(
-        observed_at=datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        observed_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         speaker=speaker,
         track=track,
         artist=artist,
