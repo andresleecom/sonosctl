@@ -11,6 +11,10 @@ can call commands in non-interactive mode and parse JSON responses.
   - `sonosctl status --json --speaker "Living Room"`
 - Queue state:
   - `sonosctl queue --json --speaker "Living Room"`
+- Playback history:
+  - `sonosctl history --json --speaker "Living Room"`
+- Continuous monitor:
+  - `sonosctl monitor --speaker "Living Room" --interval 15`
 - Group topology:
   - `sonosctl groups --json`
 - Search candidates:
@@ -28,9 +32,41 @@ can call commands in non-interactive mode and parse JSON responses.
 - Use idempotent reads before writes:
   1. `status --json`
   2. `queue --json`
-  3. decide action
+  3. `history --json`
+  4. decide action
 - Treat non-zero exit codes as command failure.
 - For flaky metadata, capture raw payloads with `status --json --raw` and analyze with `doctor status`.
+- Remember that `history` is observation-based:
+  - `status` appends newly observed `PLAYING` tracks
+  - `monitor` keeps history fresh even when no one is polling manually
+
+## Anti-repetition policy
+
+For music-selection agents, the minimum useful loop is:
+
+1. `sonosctl status --json --speaker "Living Room"`
+2. `sonosctl queue --json --speaker "Living Room"`
+3. `sonosctl history --json --speaker "Living Room"`
+4. Avoid:
+   - tracks seen in the last 20 entries
+   - artists seen in the last 10 entries
+5. Only then select or queue new music
+
+If you want history to stay fresh even when no one manually calls `status`, keep `monitor` running in the background.
+
+## Human override policy
+
+For shared rooms, a useful policy is:
+
+1. Respect human-started music by default.
+2. If playback is healthy and the queue is not starving, do nothing.
+3. If there is a clear repetition loop and the queue is too short, prefer `queue add` to inject variety.
+4. Only replace the queue or change playlist outright when:
+   - the room is idle
+   - the current mood is clearly automation-owned
+   - or a human explicitly asked for a new direction
+
+This lets agents reduce repetition without feeling intrusive.
 
 ## Safe operation guidelines
 
@@ -44,6 +80,7 @@ can call commands in non-interactive mode and parse JSON responses.
 sonosctl devices --json
 sonosctl groups --json
 sonosctl status --json --speaker "Living Room"
-sonosctl play-playlist "Morning Chill" --speaker "Living Room" --shuffle
 sonosctl queue --json --speaker "Living Room"
+sonosctl history --json --speaker "Living Room"
+sonosctl queue add "khruangbin evan finds the third room" --speaker "Living Room"
 ```

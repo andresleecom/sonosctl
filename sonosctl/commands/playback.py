@@ -14,6 +14,7 @@ from sonosctl.config import (
     effective_speaker,
     effective_timeout,
 )
+from sonosctl.history import append_playback_history
 from sonosctl.speaker import resolve_speaker, with_speaker
 from sonosctl.spotify import search_tracks
 from sonosctl.types import TrackResult
@@ -135,8 +136,7 @@ def _resolve_coordinator(speaker: object) -> object | None:
     return coordinator
 
 
-def cmd_status(args: argparse.Namespace) -> int:
-    speaker = with_speaker(args, "get status")
+def playback_snapshot(speaker: object) -> tuple[dict, dict, dict, dict]:
     coordinator = _resolve_coordinator(speaker)
     metadata_source = coordinator if coordinator else speaker
 
@@ -165,21 +165,45 @@ def cmd_status(args: argparse.Namespace) -> int:
     if artist == "Unknown":
         artist = _clean_field(track.get("stream_content"), artist)
 
+    payload = {
+        "speaker": speaker.player_name or speaker.ip_address,
+        "state": state,
+        "track": title,
+        "artist": artist,
+        "album": album,
+        "position": position,
+        "duration": duration,
+        "volume": volume,
+        "source": source,
+    }
+    if coordinator_name:
+        payload["group_coordinator"] = coordinator_name
+
+    return payload, transport, track, media
+
+
+def record_snapshot_history(payload: dict):
+    return append_playback_history(
+        speaker=str(payload["speaker"]),
+        track=str(payload["track"]),
+        artist=str(payload["artist"]),
+        album=str(payload["album"]),
+        source=str(payload["source"]),
+        state=str(payload["state"]),
+        duration=str(payload["duration"]),
+        position=str(payload["position"]),
+        group_coordinator=str(payload["group_coordinator"]) if payload.get("group_coordinator") else None,
+    )
+
+
+def cmd_status(args: argparse.Namespace) -> int:
+    speaker = with_speaker(args, "get status")
+    payload, transport, track, media = playback_snapshot(speaker)
+    record_snapshot_history(payload)
+
     if effective_json_flag(args):
-        payload = {
-            "speaker": speaker.player_name or speaker.ip_address,
-            "state": state,
-            "track": title,
-            "artist": artist,
-            "album": album,
-            "position": position,
-            "duration": duration,
-            "volume": volume,
-            "source": source,
-        }
-        if coordinator_name:
-            payload["group_coordinator"] = coordinator_name
         if args.raw:
+            payload = dict(payload)
             payload["raw"] = {
                 "transport": transport,
                 "track": track,
@@ -189,15 +213,15 @@ def cmd_status(args: argparse.Namespace) -> int:
         return 0
 
     print(f"Speaker: {speaker.player_name}")
-    if coordinator_name:
-        print(f"Group coordinator: {coordinator_name}")
-    print(f"State: {state}")
-    print(f"Track: {title}")
-    print(f"Artist: {artist}")
-    print(f"Album: {album}")
-    print(f"Position: {position} / {duration}")
-    print(f"Volume: {volume}")
-    print(f"Source: {source}")
+    if payload.get("group_coordinator"):
+        print(f"Group coordinator: {payload['group_coordinator']}")
+    print(f"State: {payload['state']}")
+    print(f"Track: {payload['track']}")
+    print(f"Artist: {payload['artist']}")
+    print(f"Album: {payload['album']}")
+    print(f"Position: {payload['position']} / {payload['duration']}")
+    print(f"Volume: {payload['volume']}")
+    print(f"Source: {payload['source']}")
     if args.raw:
         print("")
         print("Raw transport:")

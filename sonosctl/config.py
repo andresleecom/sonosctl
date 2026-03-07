@@ -16,8 +16,12 @@ DEFAULT_PLAY_PICK_LIMIT = 10
 DEFAULT_PLAY_NON_PICK_LIMIT = 1
 
 
+def config_dir() -> str:
+    return os.path.join(os.path.expanduser("~"), ".sonosctl")
+
+
 def default_config_path() -> str:
-    return os.path.join(os.path.expanduser("~"), ".sonosctl", "config.toml")
+    return os.path.join(config_dir(), "config.toml")
 
 
 def load_config(path: str | None) -> AppConfig:

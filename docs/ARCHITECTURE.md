@@ -19,6 +19,7 @@ sonosctl/
 |-- __main__.py          # python -m sonosctl support
 |-- cli.py               # Argparse tree + main() entry point
 |-- config.py            # TOML config loading, defaults, effective_* helpers
+|-- history.py           # Playback history persistence (JSONL)
 |-- speaker.py           # Speaker discovery, resolution, with_speaker helper
 |-- spotify.py           # Spotify service, search, playlists, favorites, metadata helpers
 |-- types.py             # Shared dataclasses
@@ -29,7 +30,9 @@ sonosctl/
     |-- doctor.py        # cmd_doctor_status
     |-- favorites.py     # cmd_favorites
     |-- group.py         # cmd_group, cmd_ungroup, cmd_groups
+    |-- history.py       # cmd_history
     |-- modes.py         # cmd_shuffle, cmd_repeat, cmd_crossfade
+    |-- monitor.py       # cmd_monitor
     |-- playback.py      # cmd_play, cmd_pause, cmd_resume, cmd_next, cmd_prev, cmd_volume, cmd_status
     |-- playlist.py      # cmd_play_playlist
     |-- queue.py         # cmd_queue_list, cmd_queue_add, cmd_queue_clear
@@ -40,6 +43,7 @@ sonosctl/
 
 - `types.py`: Dataclasses shared across modules.
 - `config.py`: TOML loading + effective value resolution (`effective_*`).
+- `history.py`: JSONL persistence for recently observed playback.
 - `speaker.py`: Speaker discovery/resolution infrastructure.
 - `spotify.py`: Spotify queries + Sonos favorites extraction.
 - `commands/*`: Domain command handlers.
@@ -50,9 +54,10 @@ sonosctl/
 ```text
 types.py          (no deps)
 config.py         <- types
+history.py        <- config
 speaker.py        <- config
 spotify.py        <- config, types
-commands/*        <- config, speaker, spotify, types
+commands/*        <- config, history, speaker, spotify, types
 cli.py            <- commands, config
 ```
 
@@ -88,12 +93,25 @@ SoCo `MusicService` handles Spotify interactions through Sonos integration:
 
 `favorites` is sourced from Sonos Favorites (`speaker.music_library.get_sonos_favorites`) and supports filtering for favorite playlists and favorite tracks.
 
-## Commands (21)
+### Playback History
 
-`devices`, `search`, `playlists`, `favorites`, `play`, `play-playlist`, `shuffle`, `repeat`, `crossfade`, `status`, `queue` (list/add/clear), `group`, `ungroup`, `groups`, `doctor status`, `auth-spotify`, `pause`, `resume`, `next`, `prev`, `volume`
+Playback history is stored in `~/.sonosctl/history.jsonl`.
+
+- `status` records newly observed `PLAYING` tracks
+- `monitor` keeps history alive in the background by polling a target speaker
+- `history` exposes recent entries for agents and automation workflows
+- duplicate suppression is intentionally simple and only compares against the most recent entry
+
+This is intended as a lightweight memory layer for anti-repetition logic and automation state.
+
+## Commands (23)
+
+`devices`, `search`, `playlists`, `favorites`, `history`, `monitor`, `play`, `play-playlist`, `shuffle`, `repeat`, `crossfade`, `status`, `queue` (list/add/clear), `group`, `ungroup`, `groups`, `doctor status`, `auth-spotify`, `pause`, `resume`, `next`, `prev`, `volume`
 
 ## Known Limitations
 
 - Search ranking can still return broad matches for short queries.
 - Artist/album metadata may be `Unknown` for some Sonos responses.
 - Queue operations are append/clear (no native reorder/remove by index yet).
+- Playback history is observation-based; without `status` calls or `monitor`, no new entries are recorded.
+- Anti-repetition decisions are not built into `sonosctl`; the agent must interpret `history` and decide when to do nothing, queue extra variety, or replace playback.
