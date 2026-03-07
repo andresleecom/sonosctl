@@ -100,6 +100,7 @@ Playback history is stored in `~/.sonosctl/history.jsonl`.
 - `status` records newly observed `PLAYING` tracks
 - `monitor` keeps history alive in the background by polling a target speaker
 - `history` exposes recent entries for agents and automation workflows
+- duplicate suppression is intentionally simple and only compares against the most recent entry
 
 This is intended as a lightweight memory layer for anti-repetition logic and automation state.
 
@@ -113,3 +114,4 @@ This is intended as a lightweight memory layer for anti-repetition logic and aut
 - Artist/album metadata may be `Unknown` for some Sonos responses.
 - Queue operations are append/clear (no native reorder/remove by index yet).
 - Playback history is observation-based; without `status` calls or `monitor`, no new entries are recorded.
+- Anti-repetition decisions are not built into `sonosctl`; the agent must interpret `history` and decide when to do nothing, queue extra variety, or replace playback.

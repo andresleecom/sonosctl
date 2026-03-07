@@ -36,6 +36,9 @@ can call commands in non-interactive mode and parse JSON responses.
   4. decide action
 - Treat non-zero exit codes as command failure.
 - For flaky metadata, capture raw payloads with `status --json --raw` and analyze with `doctor status`.
+- Remember that `history` is observation-based:
+  - `status` appends newly observed `PLAYING` tracks
+  - `monitor` keeps history fresh even when no one is polling manually
 
 ## Anti-repetition policy
 
@@ -51,6 +54,20 @@ For music-selection agents, the minimum useful loop is:
 
 If you want history to stay fresh even when no one manually calls `status`, keep `monitor` running in the background.
 
+## Human override policy
+
+For shared rooms, a useful policy is:
+
+1. Respect human-started music by default.
+2. If playback is healthy and the queue is not starving, do nothing.
+3. If there is a clear repetition loop and the queue is too short, prefer `queue add` to inject variety.
+4. Only replace the queue or change playlist outright when:
+   - the room is idle
+   - the current mood is clearly automation-owned
+   - or a human explicitly asked for a new direction
+
+This lets agents reduce repetition without feeling intrusive.
+
 ## Safe operation guidelines
 
 - Restrict agent execution to a trusted host on same LAN as Sonos.
@@ -63,7 +80,7 @@ If you want history to stay fresh even when no one manually calls `status`, keep
 sonosctl devices --json
 sonosctl groups --json
 sonosctl status --json --speaker "Living Room"
-sonosctl history --json --speaker "Living Room"
-sonosctl play-playlist "Morning Chill" --speaker "Living Room" --shuffle
 sonosctl queue --json --speaker "Living Room"
+sonosctl history --json --speaker "Living Room"
+sonosctl queue add "khruangbin evan finds the third room" --speaker "Living Room"
 ```
