@@ -13,10 +13,6 @@ It is built for people who want home audio to be automatable, composable, and ea
 [![CI](https://github.com/andresleecom/sonosctl/actions/workflows/ci.yml/badge.svg)](https://github.com/andresleecom/sonosctl/actions/workflows/ci.yml)
 
 <p align="center">
-  <img src="docs/assets/hecho-en-mexico.svg" alt="Hecho en México" width="220" />
-</p>
-
-<p align="center">
   <img src="docs/assets/sonosctl.png" alt="Clawde the DJ Lobster" width="180" />
 </p>
 
@@ -371,4 +367,4 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-Built by Andres Lee in Cancun.
+Built by Andres Lee in Cancun. <img src="docs/assets/hecho-en-mexico.svg" alt="Hecho en México" width="24" height="24" style="vertical-align: middle;" />
